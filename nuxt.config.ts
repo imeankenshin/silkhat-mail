@@ -29,6 +29,10 @@ export default defineNuxtConfig({
   ],
   eslint: {},
   css: ["@/assets/css/tailwind.css"],
+  icon: {
+    size: '1.5rem',
+    collections: ['material-symbols', 'lucide']
+  },
   vite: {
     resolve: {
       alias: {
