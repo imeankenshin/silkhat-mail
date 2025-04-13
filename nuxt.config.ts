@@ -31,7 +31,7 @@ export default defineNuxtConfig({
   css: ["@/assets/css/tailwind.css"],
   icon: {
     size: '1.5rem',
-    collections: ['material-symbols', 'lucide']
+    collections: ['material-symbols', 'lucide', 'logos']
   },
   vite: {
     resolve: {
