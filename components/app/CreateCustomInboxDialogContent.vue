@@ -25,9 +25,10 @@ const handleSubmit = async () => {
       </UiDialogDescription>
     </UiDialogHeader>
     <form id="create-custom-inbox-form" class="space-y-4" @submit.prevent="handleSubmit">
-      <Icon mode="svg" :name="`material-symbols:${icon}`" class="mr-2 h-4 w-4" />
-      <UiInput v-model="name" type="text" placeholder="カスタムトレイの名前" />
-      <UiInput v-model="icon" type="text" placeholder="カスタムトレイのアイコン" />
+      <div class="flex gap-1">
+        <AppIconPicker v-model="icon" class="shrink-0"/>
+        <UiInput v-model="name" type="text" placeholder="カスタムトレイの名前" />
+      </div>
       <UiInput v-model="query" type="text" placeholder="カスタムトレイの検索条件" />
     </form>
     <UiDialogFooter>
