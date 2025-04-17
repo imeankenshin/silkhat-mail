@@ -26,6 +26,7 @@ export default defineNuxtConfig({
     "@prisma/nuxt",
     "@nuxt/icon",
     "@nuxt/test-utils",
+    "@nuxthub/core",
   ],
   eslint: {},
   css: ["@/assets/css/tailwind.css"],
