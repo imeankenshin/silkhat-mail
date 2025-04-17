@@ -2,6 +2,7 @@ import { navigateTo } from "#imports";
 import { useSession } from "@/lib/auth-client";
 
 export default defineNuxtRouteMiddleware(async (to) => {
+  console.log('auth middleware')
   if (!import.meta.server) return;
   const { data: session, error } = await useSession(useFetch);
 

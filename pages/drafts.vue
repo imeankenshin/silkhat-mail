@@ -2,6 +2,9 @@
 import { callOnce } from "#imports";
 import { User, Trash2, Star } from "lucide-vue-next";
 
+definePageMeta({
+  middleware: 'auth',
+});
 const store = useDraftsStore();
 
 // 初回のメール取得

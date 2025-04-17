@@ -2,6 +2,10 @@
 import { Loader2 } from "lucide-vue-next";
 import { tryCatch } from "~/shared/utils/try-catch";
 
+definePageMeta({
+  middleware: 'auth',
+});
+
 type DraftStatus = "saving" | "saved" | "error" | "idle";
 
 const { $trpc } = useNuxtApp();

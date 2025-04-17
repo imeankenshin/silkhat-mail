@@ -6,6 +6,7 @@ import { initialed } from "#shared/utils/string";
 
 definePageMeta({
   key: (route) => route.query.q as string,
+  middleware: 'auth',
 });
 
 const { $trpc } = useNuxtApp();

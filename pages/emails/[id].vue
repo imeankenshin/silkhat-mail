@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ArrowLeft } from "lucide-vue-next";
 
+definePageMeta({
+  middleware: 'auth',
+});
+
 const route = useRoute();
 const emailId = route.params.id as ":id";
 const key = `email-${emailId}`;
