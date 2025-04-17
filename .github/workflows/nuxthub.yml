@@ -1,0 +1,47 @@
+name: Deploy to NuxtHub
+on: push
+
+jobs:
+  deploy:
+    name: "Deploy to NuxtHub"
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref == 'refs/heads/master' && 'production' || 'preview' }}
+      url: ${{ steps.deploy.outputs.deployment-url }}
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Ensure NuxtHub module is installed
+        run: pnpx nuxthub@latest ensure
+
+      - name: Build application
+        run: pnpm build
+
+      - name: Deploy to NuxtHub
+        uses: nuxt-hub/action@v1
+        id: deploy
+        with:
+          project-key: silkhat-mail-5uiy
