@@ -25,9 +25,15 @@ export default defineNuxtConfig({
     "shadcn-nuxt",
     "@prisma/nuxt",
     "@nuxt/icon",
+    "@nuxt/test-utils",
+    "@nuxthub/core",
   ],
   eslint: {},
   css: ["@/assets/css/tailwind.css"],
+  icon: {
+    size: '1.5rem',
+    collections: ['material-symbols', 'lucide', 'logos']
+  },
   vite: {
     resolve: {
       alias: {
