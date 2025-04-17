@@ -2,7 +2,6 @@
 import type { IconifyJSON } from "@iconify/types"
 import split from "just-split"
 
-const cells = useTemplateRefsList<HTMLElement>()
 const selected = defineModel<string>()
 const open = ref(false)
 const search = ref("")
@@ -27,8 +26,6 @@ const select = (value: string) => {
 watch(search, () => {
   scrollTo(0)
 })
-
-useGridNavigation(cells, { cellPerLine: 6 })
 </script>
 
 <template>
@@ -46,7 +43,6 @@ useGridNavigation(cells, { cellPerLine: 6 })
             <UiButton
               v-for="icon in icons.data"
               :key="icon"
-              :ref="cells.set"
               variant="ghost"
               size="icon"
               class="flex items-center justify-center"
