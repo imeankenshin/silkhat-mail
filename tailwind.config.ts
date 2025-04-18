@@ -3,7 +3,14 @@ import Animate from "tailwindcss-animate";
 
 export default {
   darkMode: "media",
-  content: [],
+  content: [
+    "./components/**/*.{vue,js,ts}",
+    "./layouts/**/*.{vue,js,ts}",
+    "./pages/**/*.{vue,js,ts}",
+    "./composables/**/*.{js,ts}",
+    "./plugins/**/*.{js,ts}",
+    "./nuxt.config.{js,ts}"
+  ],
   theme: {
     extend: {
       transitionTimingFunction: {
