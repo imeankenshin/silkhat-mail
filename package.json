@@ -38,7 +38,7 @@
     "just-split": "^3.2.0",
     "lucide-vue-next": "^0.476.0",
     "motion-v": "^0.11.3",
-    "nuxt": "3.15.4",
+    "nuxt": "^3.15.4",
     "reka-ui": "^2.1.1",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",
