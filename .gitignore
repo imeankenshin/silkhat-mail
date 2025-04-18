@@ -26,3 +26,5 @@ logs
 # Prisma
 .prisma
 prisma/dev.db
+
+.wrangler

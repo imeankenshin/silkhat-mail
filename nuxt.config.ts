@@ -12,7 +12,7 @@ const prismaClientIndexBrowser = resolve(
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: "2024-11-01",
+  compatibilityDate: '2025-01-28',
   build: {
     transpile: ["trpc-nuxt"],
   },
@@ -28,6 +28,9 @@ export default defineNuxtConfig({
     "@nuxt/test-utils",
     "@nuxthub/core",
   ],
+  hub: {
+    workers: true
+  },
   eslint: {},
   css: ["@/assets/css/tailwind.css"],
   icon: {
