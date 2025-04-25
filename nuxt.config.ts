@@ -30,27 +30,26 @@ export default defineNuxtConfig({
   hooks: {
     'nitro:init': async () => {
       // drizzle ORMのマイグレーションを自動実行
+      const { exec } = await import('child_process')
       try {
-        const { migrate } = await import('drizzle-orm/node-postgres/migrator')
-        const { drizzle } = await import('drizzle-orm/node-postgres')
-        const { Pool } = await import('pg')
-        const schema = await import('./server/database/schema')
-        // データベース接続の設定
-        const pool = new Pool({
-          connectionString: process.env.DATABASE_URL
-        })
-        const db = drizzle(pool, { schema })
         // マイグレーションの実行
+        // logger.info('Running database migrations...')
+        // await migrate(db, { migrationsFolder: './server/database/migrations' })
+        // logger.success('Database migrations completed successfully')
         logger.info('Running database migrations...')
-        await migrate(db, { migrationsFolder: './server/database/migrations' })
-        logger.success('Database migrations completed successfully')
+        const migration = exec('pnpm drizzle-kit migrate')
+        migration.on('exit', () => {
+          logger.success('Database migrations completed successfully')
+        })
+        migration.on('error', (error) => {
+          logger.error('Database migration failed:', error)
+        })
       }
       catch (error) {
         logger.error('Database migration failed:', error)
       }
       if (process.env.NODE_ENV !== 'development') return
       try {
-        const { exec } = await import('child_process')
         const studio = exec('pnpm drizzle-kit studio')
         // kill studio on exit
         process.on('exit', () => {

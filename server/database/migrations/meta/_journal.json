@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1745561608585,
-      "tag": "0000_clammy_miek",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1745563467406,
-      "tag": "0001_sudden_spot",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1745567072704,
-      "tag": "0002_swift_eternity",
+      "when": 1745569734004,
+      "tag": "0000_gigantic_zarda",
       "breakpoints": true
     }
   ]

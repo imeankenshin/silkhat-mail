@@ -53,6 +53,9 @@ importers:
       pinia:
         specifier: ^3.0.2
         version: 3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3))
+      postgres:
+        specifier: ^3.4.5
+        version: 3.4.5
       zod:
         specifier: ^3.24.3
         version: 3.24.3
@@ -11449,8 +11452,7 @@ snapshots:
 
   postgres-range@1.1.4: {}
 
-  postgres@3.4.5:
-    optional: true
+  postgres@3.4.5: {}
 
   precinct@11.0.5:
     dependencies:

@@ -28,9 +28,9 @@ CREATE TABLE "session" (
 --> statement-breakpoint
 CREATE TABLE "todos" (
 	"id" integer PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
+	"user_id" text,
 	"title" text NOT NULL,
-	"completed" timestamp DEFAULT '2025-04-25 06:13:28.576' NOT NULL,
+	"completed" timestamp DEFAULT '2025-04-25 08:28:53.995' NOT NULL,
 	"created_at" timestamp NOT NULL
 );
 --> statement-breakpoint
@@ -55,4 +55,5 @@ CREATE TABLE "verification" (
 );
 --> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "todos" ADD CONSTRAINT "todos_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
