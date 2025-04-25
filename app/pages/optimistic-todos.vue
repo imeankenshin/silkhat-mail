@@ -5,7 +5,7 @@ definePageMeta({
 const newTodo = ref('')
 
 const toast = useToast()
-const { user } = useUserSession()
+const { data: session } = await authClient.useSession(useFetch)
 const queryCache = useQueryCache()
 
 const { data: todos } = useQuery({
@@ -40,7 +40,7 @@ const { mutate: addTodo } = useMutation({
       // a negative id to differentiate them from the server ones
       id: -Date.now(),
       createdAt: new Date(),
-      userId: user.value!.id
+      userId: session.value!.user.id
     } satisfies Todo
     // we use newTodos to check for the cache consistency
     // a better way would be to save the entry time
@@ -183,7 +183,7 @@ const { mutate: deleteTodo } = useMutation({
         placeholder="Make a Nuxt demo"
         autocomplete="off"
         autofocus
-        :ui="{ wrapper: 'flex-1' }"
+        :ui="{ base: 'flex-1' }"
       />
 
       <UButton
