@@ -5,7 +5,6 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxt/eslint',
     '@nuxthub/core',
-    'nuxt-auth-utils',
     '@pinia/nuxt',
     '@pinia/colada-nuxt'
   ],
