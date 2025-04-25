@@ -32,7 +32,7 @@ const { mutate: addTodo, isLoading: loading } = useMutation({
 
   async onSuccess(todo) {
     await queryCache.invalidateQueries({ key: ['todos'] })
-    toast.add({ title: `Todo "${todo?.title}" created.` })
+    toast.add({ title: `Todo "${todo.title}" created.` })
   },
 
   onSettled() {

@@ -13,13 +13,7 @@ export default eventHandler(async (event) => {
     title,
     completed: 0,
     createdAt: new Date()
-  }).returning({
-    id: tables.todos.id,
-    title: tables.todos.title,
-    completed: tables.todos.completed,
-    createdAt: tables.todos.createdAt,
-    userId: tables.todos.userId
-  })
+  }).returning()
 
-  return todo
+  return todo[0]!
 })
