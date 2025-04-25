@@ -21,11 +21,11 @@ importers:
         specifier: ^0.8.25
         version: 0.8.25(@netlify/blobs@8.2.0)(db0@0.3.2(drizzle-orm@0.41.0(@cloudflare/workers-types@4.20250425.0)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/pg@8.11.14)(gel@2.0.2)(kysely@0.27.6)(pg@8.15.5)(postgres@3.4.5)))(ioredis@5.6.1)(magicast@0.3.5)(vite@6.3.3(@types/node@22.15.1)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)(yaml@2.7.1))
       '@pinia/colada':
-        specifier: ^0.14.2
-        version: 0.14.2(pinia@3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3)))
+        specifier: ^0.15.0
+        version: 0.15.0(pinia@3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3)))
       '@pinia/colada-nuxt':
         specifier: ^0.1.1
-        version: 0.1.2(@pinia/colada@0.14.2(pinia@3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3))))(magicast@0.3.5)
+        version: 0.1.2(@pinia/colada@0.15.0(pinia@3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3))))(magicast@0.3.5)
       '@pinia/nuxt':
         specifier: ^0.11.0
         version: 0.11.0(magicast@0.3.5)(pinia@3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3)))
@@ -1675,8 +1675,8 @@ packages:
     peerDependencies:
       '@pinia/colada': ^0.15.0
 
-  '@pinia/colada@0.14.2':
-    resolution: {integrity: sha512-nixr1cqkk5RHrafXfJPk7J/F1srCFZTvhrdNfUEx3/N2lRamcYlayniYDwqlRPOw8PHmsRKyRAGgwDiV76sGJA==}
+  '@pinia/colada@0.15.0':
+    resolution: {integrity: sha512-Xr8K6OH1vwD/aRAaHAC7bqo4I1dugICUG8uMdHZBxZqE3eWETsziPuEOw0+55JwQ20V5WRbk4Bh96m66Omlxgw==}
     peerDependencies:
       pinia: ^2.2.6 || ^3.0.0
 
@@ -7766,14 +7766,14 @@ snapshots:
 
   '@petamoriken/float16@3.9.2': {}
 
-  '@pinia/colada-nuxt@0.1.2(@pinia/colada@0.14.2(pinia@3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3))))(magicast@0.3.5)':
+  '@pinia/colada-nuxt@0.1.2(@pinia/colada@0.15.0(pinia@3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3))))(magicast@0.3.5)':
     dependencies:
       '@nuxt/kit': 3.16.2(magicast@0.3.5)
-      '@pinia/colada': 0.14.2(pinia@3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3)))
+      '@pinia/colada': 0.15.0(pinia@3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3)))
     transitivePeerDependencies:
       - magicast
 
-  '@pinia/colada@0.14.2(pinia@3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3)))':
+  '@pinia/colada@0.15.0(pinia@3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3)))':
     dependencies:
       '@vue/devtools-api': 7.7.5
       pinia: 3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3))
