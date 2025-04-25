@@ -2,7 +2,7 @@ import { boolean, timestamp, pgTable, text, integer } from 'drizzle-orm/pg-core'
 
 export const todos = pgTable('todos', {
   id: integer('id').primaryKey(),
-  userId: integer('user_id').notNull(), // GitHub Id
+  userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }), // GitHub Id
   title: text('title').notNull(),
   completed: timestamp('completed').notNull().default(new Date()),
   createdAt: timestamp('created_at').notNull()

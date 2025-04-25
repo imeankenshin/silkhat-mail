@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '#ui/types'
 
-const { loggedIn, user, clear } = useUserSession()
+const { data: session } = await authClient.useSession(useFetch)
+const loggedIn = computed(() => !!session.value)
 const colorMode = useColorMode()
 
 watch(loggedIn, () => {
@@ -15,6 +16,12 @@ const isDarkMode = computed({
   set: () =>
     (colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark')
 })
+
+const signIn = () => {
+  authClient.signIn.social({
+    provider: 'google'
+  })
+}
 
 useHead({
   htmlAttrs: { lang: 'en' },
@@ -36,7 +43,7 @@ const items = [
     {
       label: 'Logout',
       icon: 'i-lucide-log-out',
-      onSelect: clear
+      onSelect: () => authClient.signOut()
     }
   ]
 ] satisfies DropdownMenuItem[][]
@@ -68,12 +75,12 @@ const items = [
           </h3>
           <UButton
             v-if="!loggedIn"
-            to="/api/auth/github"
-            icon="i-simple-icons-github"
-            label="Login with GitHub"
+            icon="i-simple-icons-google"
+            label="Login with Google"
             color="neutral"
             size="xs"
             external
+            @click="signIn()"
           />
           <div
             v-else
@@ -94,7 +101,7 @@ const items = [
               variant="ghost"
             />
             <UDropdownMenu
-              v-if="user"
+              v-if="session?.user"
               :items="items"
             >
               <UButton
@@ -103,11 +110,11 @@ const items = [
                 trailing-icon="i-lucide-chevron-down"
               >
                 <UAvatar
-                  :src="`https://github.com/${user.login}.png`"
-                  :alt="user.login"
+                  :src="session.user.image || undefined"
+                  :alt="session.user.name"
                   size="3xs"
                 />
-                {{ user.login }}
+                {{ session.user.name }}
               </UButton>
             </UDropdownMenu>
           </div>
