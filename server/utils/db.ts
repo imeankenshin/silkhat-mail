@@ -6,7 +6,7 @@ export { sql, eq, and, or } from 'drizzle-orm'
 export const tables = schema
 
 export function useDB() {
-  return drizzle(process.env.POSTGRES_URL!, { schema })
+  return drizzle(process.env.DATABASE_URL!, { schema })
 }
 
 export type Todo = typeof tables.todos.$inferSelect
