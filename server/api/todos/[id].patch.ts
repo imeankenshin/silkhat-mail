@@ -1,5 +1,6 @@
 import { eq, and } from 'drizzle-orm'
 import { useValidatedParams, useValidatedBody, z, zh } from 'h3-zod'
+import { authorize } from '~~/server/utils/auth'
 
 export default eventHandler(async (event) => {
   const { id } = await useValidatedParams(event, {
@@ -8,7 +9,7 @@ export default eventHandler(async (event) => {
   const { completed } = await useValidatedBody(event, {
     completed: z.number().int().min(0).max(1)
   })
-  const { user } = await requireUserSession(event)
+  const { user } = await authorize(event)
 
   // List todos for the current user
   const todo = await useDB().update(tables.todos).set({
@@ -16,7 +17,7 @@ export default eventHandler(async (event) => {
   }).where(and(
     eq(tables.todos.id, id),
     eq(tables.todos.userId, user.id)
-  )).returning().get()
+  )).returning()
 
   return todo
 })

@@ -27,10 +27,10 @@ CREATE TABLE "session" (
 );
 --> statement-breakpoint
 CREATE TABLE "todos" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" text,
 	"title" text NOT NULL,
-	"completed" timestamp DEFAULT '2025-04-25 08:28:53.995' NOT NULL,
+	"completed" integer NOT NULL,
 	"created_at" timestamp NOT NULL
 );
 --> statement-breakpoint
