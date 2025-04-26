@@ -7,27 +7,18 @@ const newTodoInput = useTemplateRef('new-todo')
 
 const toast = useToast()
 const queryCache = useQueryCache()
+const { $trpc } = useNuxtApp()
 
 const { data: todos } = useQuery({
   key: ['todos'],
-  // NOTE: the cast sometimes avoids an "Excessive depth check" TS error
-  // using $fetch directly doesn't avoid the round trip to the server
-  // when doing SSR
-  // https://github.com/nuxt/nuxt/issues/24813
-  query: () => useRequestFetch()('/api/todos') as Promise<Todo[]>
+  query: () => $trpc.todos.get.query() as Promise<Todo[]>
 })
 
 const { mutate: addTodo, isLoading: loading } = useMutation({
   mutation: (title: string) => {
     if (!title.trim()) throw new Error('Title is required')
 
-    return $fetch('/api/todos', {
-      method: 'POST',
-      body: {
-        title,
-        completed: 0
-      }
-    })
+    return $trpc.todos.add.mutate({ title })
   },
 
   async onSuccess(todo) {
@@ -65,11 +56,9 @@ const { mutate: addTodo, isLoading: loading } = useMutation({
 
 const { mutate: toggleTodo } = useMutation({
   mutation: (todo: Todo) =>
-    $fetch(`/api/todos/${todo.id}`, {
-      method: 'PATCH',
-      body: {
-        completed: Number(!todo.completed)
-      }
+    $trpc.todos.update.mutate({
+      id: todo.id,
+      values: { completed: Number(!todo.completed) }
     }),
 
   async onSuccess() {
@@ -79,7 +68,7 @@ const { mutate: toggleTodo } = useMutation({
 
 const { mutate: deleteTodo } = useMutation({
   mutation: (todo: Todo) =>
-    $fetch(`/api/todos/${todo.id}`, { method: 'DELETE' }),
+    $trpc.todos.delete.mutate({ id: todo.id }),
 
   async onSuccess(_result, todo) {
     await queryCache.invalidateQueries({ key: ['todos'] })
