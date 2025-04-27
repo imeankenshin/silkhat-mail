@@ -22,14 +22,13 @@
     "better-auth": "^1.2.7",
     "drizzle-kit": "^0.30.6",
     "drizzle-orm": "^0.41.0",
-    "h3-zod": "^0.5.3",
     "nuxt": "^3.16.2",
     "pg": "^8.15.5",
     "pinia": "^3.0.2",
     "postgres": "^3.4.5",
     "superjson": "^2.2.2",
     "trpc-nuxt": "^1.0.5",
-    "zod": "^3.24.3"
+    "valibot": "^1.0.0"
   },
   "devDependencies": {
     "@nuxt/devtools": "^2.3.2",

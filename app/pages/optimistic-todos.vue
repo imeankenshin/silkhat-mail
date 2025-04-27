@@ -70,12 +70,8 @@ const { mutate: addTodo } = useMutation({
     if (newTodos != null && newTodos === queryCache.getQueryData(['todos'])) {
       queryCache.setQueryData(['todos'], oldTodos)
     }
-
-    if (isNuxtZodError(err)) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const title = (err as any).data.data.issues
-        .map((issue: { message: string }) => issue.message)
-        .join('\n')
+    if (isTRPCClientValidationError(err)) {
+      const title = err.message
       toast.add({ title, color: 'error' })
     }
     else {

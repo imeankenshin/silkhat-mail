@@ -1,6 +1,7 @@
 import { initTRPC } from '@trpc/server'
 import type { H3Event } from 'h3'
 import superjson from 'superjson'
+import { isValiError } from 'valibot'
 
 export const createTRPCContext = async (event: H3Event) => {
   return { event }
@@ -14,7 +15,20 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
   /**
   * @see https://trpc.io/docs/server/data-transformers
   */
-  transformer: superjson
+  transformer: superjson,
+  errorFormatter: ({ error, shape }) => {
+    if (isValiError(error.cause)) return {
+      message: 'Invalid input',
+      code: 400,
+      data: {
+        code: 'BAD_REQUEST',
+        httpStatus: 400,
+        path: shape.data.path,
+        issues: error.cause.issues.flat()
+      }
+    }
+    return shape
+  }
 })
 
 // Base router and procedure helpers
