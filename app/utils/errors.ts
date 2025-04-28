@@ -14,7 +14,3 @@ export function isNuxtValiError(err: unknown): err is NuxtError<{ data: ValiErro
 export function isTRPCClientError(err: unknown): err is TRPCClientError<AppRouter> {
   return err instanceof TRPCClientError
 }
-
-export function isTRPCClientValidationError(err: unknown): err is TRPCClientError<AppRouter> {
-  return isTRPCClientError(err) && err.data?.code === 'BAD_REQUEST'
-}

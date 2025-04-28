@@ -39,10 +39,10 @@ const { mutate: addTodo, isLoading: loading } = useMutation({
   },
 
   onError(err) {
-    if (isTRPCClientValidationError(err)) {
-      console.log({ ...err })
-      const title = err.message
-      toast.add({ title, color: 'error' })
+    if (isTRPCClientError(err) && err.data?.issues) {
+      const title = err.data.issues.map(issue => issue.message).join('\n')
+      if (title)
+        toast.add({ title, color: 'error' })
     }
     else {
       console.error(err)

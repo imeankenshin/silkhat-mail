@@ -70,9 +70,10 @@ const { mutate: addTodo } = useMutation({
     if (newTodos != null && newTodos === queryCache.getQueryData(['todos'])) {
       queryCache.setQueryData(['todos'], oldTodos)
     }
-    if (isTRPCClientValidationError(err)) {
-      const title = err.message
-      toast.add({ title, color: 'error' })
+    if (isTRPCClientError(err) && err.data?.issues) {
+      const title = err.data.issues.map(issue => issue.message).join('\n')
+      if (title)
+        toast.add({ title, color: 'error' })
     }
     else {
       console.error(err)
