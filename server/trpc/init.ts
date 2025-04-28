@@ -23,8 +23,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
         ...shape,
         data: {
           ...shape.data,
-          issues: error.cause.issues.flat(),
-          userFriendly: true
+          issues: error.cause.issues.flat()
         }
       }
     }
@@ -33,8 +32,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
       ...shape,
       data: {
         ...shape.data,
-        issues: null,
-        userFriendly: shape.data.code !== 'INTERNAL_SERVER_ERROR'
+        issues: null
       }
     }
   }
