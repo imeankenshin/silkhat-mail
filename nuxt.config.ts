@@ -24,6 +24,9 @@ export default defineNuxtConfig({
     ]
   },
   css: ['~/assets/main.css'],
+  build: {
+    transpile: ['trpc-nuxt']
+  },
   future: { compatibilityVersion: 4 },
   compatibilityDate: '2025-04-02',
   hooks: {

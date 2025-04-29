@@ -1,6 +1,5 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
-import type { H3Event } from 'h3'
 import { useDB } from './db'
 
 export const auth = betterAuth({
@@ -15,14 +14,3 @@ export const auth = betterAuth({
     }
   }
 })
-
-export const authorize = async (event: H3Event) => {
-  const session = await auth.api.getSession(event)
-  if (!session) {
-    throw createError({
-      statusCode: 401,
-      message: 'Unauthorized'
-    })
-  }
-  return session
-}
