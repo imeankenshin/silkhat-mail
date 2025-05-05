@@ -54,11 +54,9 @@ useSeoMeta({
 
     <UiCard>
       <template #header>
-        <h3 class="text-lg font-semibold leading-6">
-          <NuxtLink to="/">
-            Atidone
-          </NuxtLink>
-        </h3>
+        <NuxtLink to="/">
+          Atidone
+        </NuxtLink>
         <UiButton
           v-if="!loggedIn"
           icon="i-simple-icons-google"
@@ -137,6 +135,7 @@ useSeoMeta({
       </NuxtLink>
     </footer>
   </div>
+  <UiSonner />
 </template>
 
 <style lang="postcss">

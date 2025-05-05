@@ -9,12 +9,16 @@ interface Props extends PrimitiveProps {
   variant?: ButtonVariants['variant']
   size?: ButtonVariants['size']
   class?: HTMLAttributes['class']
+  type?: HTMLButtonElement['type']
   icon?: string
   to?: string
 }
 
+const isButton = computed(() => props.as === 'button' || !props.to)
+
 const props = withDefaults(defineProps<Props>(), {
-  as: 'button'
+  as: 'button',
+  type: 'button'
 })
 </script>
 
@@ -25,6 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
     :as-child="asChild"
     :class="cn(buttonVariants({ variant, size }), props.class)"
     :to="to"
+    :type="isButton ? type : undefined"
   >
     <Icon
       v-if="icon"

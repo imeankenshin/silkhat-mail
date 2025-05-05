@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import { toast } from 'vue-sonner'
+
 definePageMeta({
   middleware: 'auth'
 })
 const newTodo = ref('')
 
-const toast = useToast()
 const { data: session } = await authClient.useSession(useFetch)
 const queryCache = useQueryCache()
 const { $trpc } = useNuxtApp()
@@ -73,11 +74,11 @@ const { mutate: addTodo } = useMutation({
     if (isTRPCClientError(err) && err.data?.issues) {
       const title = err.data.issues.map(issue => issue.message).join('\n')
       if (title)
-        toast.add({ title, color: 'error' })
+        toast.error(title)
     }
     else {
       console.error(err)
-      toast.add({ title: 'Unexpected Error', color: 'error' })
+      toast.error('Unexpected Error')
     }
   }
 })
@@ -118,7 +119,7 @@ const { mutate: toggleTodo } = useMutation({
     }
 
     console.error(err)
-    toast.add({ title: 'Unexpected Error', color: 'error' })
+    toast.error('Unexpected Error')
   }
 })
 
@@ -151,7 +152,7 @@ const { mutate: deleteTodo } = useMutation({
     }
 
     console.error(err)
-    toast.add({ title: 'Unexpected Error', color: 'error' })
+    toast.error('Unexpected Error')
   }
 })
 </script>
