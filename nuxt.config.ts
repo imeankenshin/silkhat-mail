@@ -1,12 +1,15 @@
 import { logger } from 'nuxt/kit'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
   modules: [
-    '@nuxt/ui',
     '@nuxt/eslint',
     '@nuxthub/core',
     '@pinia/nuxt',
-    '@pinia/colada-nuxt'
+    '@pinia/colada-nuxt',
+    'shadcn-nuxt',
+    '@nuxtjs/color-mode',
+    '@nuxt/icon'
   ],
   devtools: {
     enabled: true,
@@ -24,11 +27,18 @@ export default defineNuxtConfig({
     ]
   },
   css: ['~/assets/main.css'],
+  colorMode: {
+    storage: 'localStorage',
+    classSuffix: ''
+  },
   build: {
     transpile: ['trpc-nuxt']
   },
   future: { compatibilityVersion: 4 },
   compatibilityDate: '2025-04-02',
+  vite: {
+    plugins: [tailwindcss()]
+  },
   hooks: {
     'nitro:init': async () => {
       // drizzle ORMのマイグレーションを自動実行

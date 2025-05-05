@@ -29,7 +29,7 @@
         class="text-(--ui-primary)"
       >NuxtHub</a> for a zero-config development & deployment experience on Cloudflare.
     </p>
-    <USeparator />
+    <UiSeparator />
     <p class="text-sm text-(--ui-text-muted) italic">
       No personal information regarding your GitHub account are stored in database.<br>
       We store only the todos created linked with your GitHub ID.

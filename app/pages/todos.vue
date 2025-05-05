@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import { toast } from 'vue-sonner'
+
 definePageMeta({
   middleware: 'auth'
 })
 const newTodo = ref('')
 const newTodoInput = useTemplateRef('new-todo')
 
-const toast = useToast()
 const queryCache = useQueryCache()
 const { $trpc } = useNuxtApp()
 
@@ -23,7 +24,7 @@ const { mutate: addTodo, isLoading: loading } = useMutation({
 
   async onSuccess(todo) {
     await queryCache.invalidateQueries({ key: ['todos'] })
-    toast.add({ title: `Todo "${todo.title}" created.` })
+    toast.success(`Todo "${todo.title}" created.`)
   },
 
   onSettled() {
@@ -34,7 +35,7 @@ const { mutate: addTodo, isLoading: loading } = useMutation({
     nextTick()
       .then(() => nextTick())
       .then(() => {
-        newTodoInput.value?.inputRef?.focus()
+        newTodoInput.value?.inputRef.focus()
       })
   },
 
@@ -42,11 +43,11 @@ const { mutate: addTodo, isLoading: loading } = useMutation({
     if (isTRPCClientError(err) && err.data?.issues) {
       const title = err.data.issues.map(issue => issue.message).join('\n')
       if (title)
-        toast.add({ title, color: 'error' })
+        toast.error(title)
     }
     else {
       console.error(err)
-      toast.add({ title: 'Unexpected Error', color: 'error' })
+      toast.error('Unexpected Error')
     }
   }
 })
@@ -69,7 +70,7 @@ const { mutate: deleteTodo } = useMutation({
 
   async onSuccess(_result, todo) {
     await queryCache.invalidateQueries({ key: ['todos'] })
-    toast.add({ title: `Todo "${todo.title}" deleted.` })
+    toast.success(`Todo "${todo.title}" deleted.`)
   }
 })
 </script>
@@ -80,7 +81,7 @@ const { mutate: deleteTodo } = useMutation({
     @submit.prevent="addTodo(newTodo)"
   >
     <div class="flex items-center gap-2">
-      <UInput
+      <UiInput
         ref="new-todo"
         v-model="newTodo"
         name="todo"
@@ -92,7 +93,7 @@ const { mutate: deleteTodo } = useMutation({
         :ui="{ base: 'flex-1' }"
       />
 
-      <UButton
+      <UiButton
         type="submit"
         icon="i-lucide-plus"
         :loading="loading"
@@ -111,15 +112,15 @@ const { mutate: deleteTodo } = useMutation({
           :class="[todo.completed ? 'line-through text-gray-500' : '']"
         >{{ todo.title }}</span>
 
-        <USwitch
+        <UiSwitch
           :model-value="Boolean(todo.completed)"
           @update:model-value="toggleTodo(todo)"
         />
 
-        <UButton
+        <UiButton
           color="error"
-          variant="soft"
-          size="xs"
+          variant="ghost"
+          size="icon"
           icon="i-lucide-x"
           @click="deleteTodo(todo)"
         />

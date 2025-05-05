@@ -31,7 +31,8 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
     return {
       ...shape,
       data: {
-        ...shape.data
+        ...shape.data,
+        issues: undefined
       }
     }
   }

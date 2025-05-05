@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { DropdownMenuItem } from '#ui/types'
-
 const { data: session } = await authClient.useSession(useFetch)
 const loggedIn = computed(() => !!session.value)
 const colorMode = useColorMode()
@@ -37,110 +35,107 @@ useSeoMeta({
   twitterImage: '/social-image.png',
   twitterCard: 'summary_large_image'
 })
-
-const items = [
-  [
-    {
-      label: 'Logout',
-      icon: 'i-lucide-log-out',
-      onSelect: () => authClient.signOut()
-    }
-  ]
-] satisfies DropdownMenuItem[][]
 </script>
 
 <template>
-  <UApp>
-    <UContainer class="min-h-screen flex flex-col my-4">
-      <div class="mb-2 text-right">
-        <UButton
-          square
-          variant="ghost"
-          color="neutral"
-          :icon="
-            $colorMode.preference === 'dark' || $colorMode.preference === 'system'
-              ? 'i-lucide-moon'
-              : 'i-lucide-sun'
-          "
-          @click="isDarkMode = !isDarkMode"
-        />
-      </div>
+  <div class="max-w-xl mx-auto min-h-screen flex flex-col my-4">
+    <div class="mb-2 text-right">
+      <UiButton
+        variant="ghost"
+        size="icon"
+        :icon="
+          $colorMode.preference === 'dark' || $colorMode.preference === 'system'
+            ? 'i-lucide-moon'
+            : 'i-lucide-sun'
+        "
+        @click="isDarkMode = !isDarkMode"
+      />
+    </div>
 
-      <UCard variant="subtle">
-        <template #header>
-          <h3 class="text-lg font-semibold leading-6">
-            <NuxtLink to="/">
-              Atidone
-            </NuxtLink>
-          </h3>
-          <UButton
-            v-if="!loggedIn"
-            icon="i-simple-icons-google"
-            label="Login with Google"
-            color="neutral"
-            size="xs"
-            external
-            @click="signIn()"
+    <UiCard>
+      <template #header>
+        <NuxtLink to="/">
+          Atidone
+        </NuxtLink>
+        <UiButton
+          v-if="!loggedIn"
+          icon="i-simple-icons-google"
+          label="Login with Google"
+          color="neutral"
+          size="icon"
+          external
+          @click="signIn()"
+        />
+        <div
+          v-else
+          class="flex flex-wrap -mx-2 sm:mx-0"
+        >
+          <UiButton
+            to="/todos"
+            icon="i-lucide-list"
+            label="Todos"
+            size="icon"
+            :color="$route.path === '/todos' ? 'primary' : 'neutral'"
+            variant="ghost"
           />
-          <div
-            v-else
-            class="flex flex-wrap -mx-2 sm:mx-0"
+          <UiButton
+            to="/optimistic-todos"
+            icon="i-lucide-sparkles"
+            label="Optimistic Todos"
+            size="icon"
+            :color="$route.path === '/optimistic-todos' ? 'primary' : 'neutral'"
+            variant="ghost"
+          />
+          <UiDropdownMenu
+            v-if="session?.user"
           >
-            <UButton
-              to="/todos"
-              icon="i-lucide-list"
-              label="Todos"
-              :color="$route.path === '/todos' ? 'primary' : 'neutral'"
-              variant="ghost"
-            />
-            <UButton
-              to="/optimistic-todos"
-              icon="i-lucide-sparkles"
-              label="Optimistic Todos"
-              :color="$route.path === '/optimistic-todos' ? 'primary' : 'neutral'"
-              variant="ghost"
-            />
-            <UDropdownMenu
-              v-if="session?.user"
-              :items="items"
-            >
-              <UButton
+            <UiDropdownMenuTrigger as-child>
+              <UiButton
                 color="neutral"
                 variant="ghost"
-                trailing-icon="i-lucide-chevron-down"
+                size="lg"
+                icon="i-lucide-chevron-down"
               >
-                <UAvatar
-                  :src="session.user.image || undefined"
+                <UiAvatar
+                  :src="session.user.image"
                   :alt="session.user.name"
-                  size="3xs"
                 />
                 {{ session.user.name }}
-              </UButton>
-            </UDropdownMenu>
-          </div>
-        </template>
-        <NuxtPage />
-      </UCard>
+              </UiButton>
+            </UiDropdownMenuTrigger>
+            <UiDropdownMenuContent>
+              <UiDropdownMenuGroup>
+                <UiDropdownMenuItem @select="authClient.signOut()">
+                  <Icon name="i-lucide-log-out" />
+                  Logout
+                </UiDropdownMenuItem>
+              </UiDropdownMenuGroup>
+            </UiDropdownMenuContent>
+          </UiDropdownMenu>
+        </div>
+      </template>
+      <NuxtPage />
+    </UiCard>
 
-      <footer class="text-center mt-2">
-        <NuxtLink
-          href="https://github.com/atinux/atidone"
-          target="_blank"
-          class="text-sm text-neutral-500 hover:text-neutral-700"
-        >
-          GitHub
-        </NuxtLink>
-        ·
-        <NuxtLink
-          href="https://twitter.com/atinux"
-          target="_blank"
-          class="text-sm text-neutral-500 hover:text-neutral-700"
-        >
-          Twitter
-        </NuxtLink>
-      </footer>
-    </UContainer>
-  </UApp>
+    <footer class="text-center mt-2">
+      <NuxtLink
+        href="https://github.com/atinux/atidone"
+        target="_blank"
+        class="text-sm text-neutral-500 hover:text-neutral-700"
+      >
+        GitHub
+      </NuxtLink>
+      ·
+      <NuxtLink
+        href="https://twitter.com/atinux"
+        target="_blank"
+        class="text-sm text-neutral-500 hover:text-neutral-700"
+      >
+        Twitter
+      </NuxtLink>
+    </footer>
+  </div>
+  <UiSonner />
 </template>
 
 <style lang="postcss">
