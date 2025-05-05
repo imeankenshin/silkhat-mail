@@ -34,7 +34,7 @@ const { mutate: addTodo, isLoading: loading } = useMutation({
     nextTick()
       .then(() => nextTick())
       .then(() => {
-        newTodoInput.value?.inputRef?.focus()
+        newTodoInput.value?.inputRef.focus()
       })
   },
 
@@ -80,7 +80,7 @@ const { mutate: deleteTodo } = useMutation({
     @submit.prevent="addTodo(newTodo)"
   >
     <div class="flex items-center gap-2">
-      <UInput
+      <UiInput
         ref="new-todo"
         v-model="newTodo"
         name="todo"
@@ -111,7 +111,7 @@ const { mutate: deleteTodo } = useMutation({
           :class="[todo.completed ? 'line-through text-gray-500' : '']"
         >{{ todo.title }}</span>
 
-        <USwitch
+        <UiSwitch
           :model-value="Boolean(todo.completed)"
           @update:model-value="toggleTodo(todo)"
         />

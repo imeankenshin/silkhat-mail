@@ -29,6 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
     <Icon
       v-if="icon"
       :name="icon"
+      mode="svg"
     />
     <slot />
   </Primitive>

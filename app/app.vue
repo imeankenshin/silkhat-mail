@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { DropdownMenuItem } from '#ui/types'
-
 const { data: session } = await authClient.useSession(useFetch)
 const loggedIn = computed(() => !!session.value)
 const colorMode = useColorMode()
@@ -37,20 +35,10 @@ useSeoMeta({
   twitterImage: '/social-image.png',
   twitterCard: 'summary_large_image'
 })
-
-const items = [
-  [
-    {
-      label: 'Logout',
-      icon: 'i-lucide-log-out',
-      onSelect: () => authClient.signOut()
-    }
-  ]
-] satisfies DropdownMenuItem[][]
 </script>
 
 <template>
-  <UContainer class="min-h-screen flex flex-col my-4">
+  <div class="max-w-xl mx-auto min-h-screen flex flex-col my-4">
     <div class="mb-2 text-right">
       <UiButton
         variant="ghost"
@@ -64,7 +52,7 @@ const items = [
       />
     </div>
 
-    <UCard variant="subtle">
+    <UiCard>
       <template #header>
         <h3 class="text-lg font-semibold leading-6">
           <NuxtLink to="/">
@@ -100,27 +88,36 @@ const items = [
             :color="$route.path === '/optimistic-todos' ? 'primary' : 'neutral'"
             variant="ghost"
           />
-          <UDropdownMenu
+          <UiDropdownMenu
             v-if="session?.user"
-            :items="items"
           >
-            <UiButton
-              color="neutral"
-              variant="ghost"
-              icon="i-lucide-chevron-down"
-            >
-              <UAvatar
-                :src="session.user.image || undefined"
-                :alt="session.user.name"
-                size="3xs"
-              />
-              {{ session.user.name }}
-            </UiButton>
-          </UDropdownMenu>
+            <UiDropdownMenuTrigger as-child>
+              <UiButton
+                color="neutral"
+                variant="ghost"
+                size="lg"
+                icon="i-lucide-chevron-down"
+              >
+                <UiAvatar
+                  :src="session.user.image"
+                  :alt="session.user.name"
+                />
+                {{ session.user.name }}
+              </UiButton>
+            </UiDropdownMenuTrigger>
+            <UiDropdownMenuContent>
+              <UiDropdownMenuGroup>
+                <UiDropdownMenuItem @select="authClient.signOut()">
+                  <Icon name="i-lucide-log-out" />
+                  Logout
+                </UiDropdownMenuItem>
+              </UiDropdownMenuGroup>
+            </UiDropdownMenuContent>
+          </UiDropdownMenu>
         </div>
       </template>
       <NuxtPage />
-    </UCard>
+    </UiCard>
 
     <footer class="text-center mt-2">
       <NuxtLink
@@ -139,7 +136,7 @@ const items = [
         Twitter
       </NuxtLink>
     </footer>
-  </UContainer>
+  </div>
 </template>
 
 <style lang="postcss">

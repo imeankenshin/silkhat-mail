@@ -162,14 +162,13 @@ const { mutate: deleteTodo } = useMutation({
     @submit.prevent="addTodo(newTodo)"
   >
     <div class="flex items-center gap-2">
-      <UInput
+      <UiInput
         v-model="newTodo"
         name="todo"
         class="flex-1"
         placeholder="Make a Nuxt demo"
         autocomplete="off"
         autofocus
-        :ui="{ base: 'flex-1' }"
       />
 
       <UiButton
@@ -193,7 +192,7 @@ const { mutate: deleteTodo } = useMutation({
           }"
         >{{ todo.title }}</span>
 
-        <USwitch
+        <UiSwitch
           :model-value="Boolean(todo.completed)"
           :disabled="todo.id < 0"
           @update:model-value="toggleTodo(todo)"
