@@ -172,7 +172,7 @@ const { mutate: deleteTodo } = useMutation({
         :ui="{ base: 'flex-1' }"
       />
 
-      <UButton
+      <UiButton
         type="submit"
         icon="i-lucide-plus"
         :disabled="newTodo.trim().length === 0"
@@ -199,10 +199,10 @@ const { mutate: deleteTodo } = useMutation({
           @update:model-value="toggleTodo(todo)"
         />
 
-        <UButton
+        <UiButton
           color="error"
-          variant="soft"
-          size="xs"
+          variant="ghost"
+          size="icon"
           icon="i-lucide-x"
           :disabled="todo.id < 0"
           @click="deleteTodo(todo)"

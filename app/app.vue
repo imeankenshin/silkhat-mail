@@ -50,97 +50,96 @@ const items = [
 </script>
 
 <template>
-  <UApp>
-    <UContainer class="min-h-screen flex flex-col my-4">
-      <div class="mb-2 text-right">
-        <UButton
-          square
-          variant="ghost"
+  <UContainer class="min-h-screen flex flex-col my-4">
+    <div class="mb-2 text-right">
+      <UiButton
+        variant="ghost"
+        size="icon"
+        :icon="
+          $colorMode.preference === 'dark' || $colorMode.preference === 'system'
+            ? 'i-lucide-moon'
+            : 'i-lucide-sun'
+        "
+        @click="isDarkMode = !isDarkMode"
+      />
+    </div>
+
+    <UCard variant="subtle">
+      <template #header>
+        <h3 class="text-lg font-semibold leading-6">
+          <NuxtLink to="/">
+            Atidone
+          </NuxtLink>
+        </h3>
+        <UiButton
+          v-if="!loggedIn"
+          icon="i-simple-icons-google"
+          label="Login with Google"
           color="neutral"
-          :icon="
-            $colorMode.preference === 'dark' || $colorMode.preference === 'system'
-              ? 'i-lucide-moon'
-              : 'i-lucide-sun'
-          "
-          @click="isDarkMode = !isDarkMode"
+          size="icon"
+          external
+          @click="signIn()"
         />
-      </div>
-
-      <UCard variant="subtle">
-        <template #header>
-          <h3 class="text-lg font-semibold leading-6">
-            <NuxtLink to="/">
-              Atidone
-            </NuxtLink>
-          </h3>
-          <UButton
-            v-if="!loggedIn"
-            icon="i-simple-icons-google"
-            label="Login with Google"
-            color="neutral"
-            size="xs"
-            external
-            @click="signIn()"
+        <div
+          v-else
+          class="flex flex-wrap -mx-2 sm:mx-0"
+        >
+          <UiButton
+            to="/todos"
+            icon="i-lucide-list"
+            label="Todos"
+            size="icon"
+            :color="$route.path === '/todos' ? 'primary' : 'neutral'"
+            variant="ghost"
           />
-          <div
-            v-else
-            class="flex flex-wrap -mx-2 sm:mx-0"
+          <UiButton
+            to="/optimistic-todos"
+            icon="i-lucide-sparkles"
+            label="Optimistic Todos"
+            size="icon"
+            :color="$route.path === '/optimistic-todos' ? 'primary' : 'neutral'"
+            variant="ghost"
+          />
+          <UDropdownMenu
+            v-if="session?.user"
+            :items="items"
           >
-            <UButton
-              to="/todos"
-              icon="i-lucide-list"
-              label="Todos"
-              :color="$route.path === '/todos' ? 'primary' : 'neutral'"
+            <UiButton
+              color="neutral"
               variant="ghost"
-            />
-            <UButton
-              to="/optimistic-todos"
-              icon="i-lucide-sparkles"
-              label="Optimistic Todos"
-              :color="$route.path === '/optimistic-todos' ? 'primary' : 'neutral'"
-              variant="ghost"
-            />
-            <UDropdownMenu
-              v-if="session?.user"
-              :items="items"
+              icon="i-lucide-chevron-down"
             >
-              <UButton
-                color="neutral"
-                variant="ghost"
-                trailing-icon="i-lucide-chevron-down"
-              >
-                <UAvatar
-                  :src="session.user.image || undefined"
-                  :alt="session.user.name"
-                  size="3xs"
-                />
-                {{ session.user.name }}
-              </UButton>
-            </UDropdownMenu>
-          </div>
-        </template>
-        <NuxtPage />
-      </UCard>
+              <UAvatar
+                :src="session.user.image || undefined"
+                :alt="session.user.name"
+                size="3xs"
+              />
+              {{ session.user.name }}
+            </UiButton>
+          </UDropdownMenu>
+        </div>
+      </template>
+      <NuxtPage />
+    </UCard>
 
-      <footer class="text-center mt-2">
-        <NuxtLink
-          href="https://github.com/atinux/atidone"
-          target="_blank"
-          class="text-sm text-neutral-500 hover:text-neutral-700"
-        >
-          GitHub
-        </NuxtLink>
-        ·
-        <NuxtLink
-          href="https://twitter.com/atinux"
-          target="_blank"
-          class="text-sm text-neutral-500 hover:text-neutral-700"
-        >
-          Twitter
-        </NuxtLink>
-      </footer>
-    </UContainer>
-  </UApp>
+    <footer class="text-center mt-2">
+      <NuxtLink
+        href="https://github.com/atinux/atidone"
+        target="_blank"
+        class="text-sm text-neutral-500 hover:text-neutral-700"
+      >
+        GitHub
+      </NuxtLink>
+      ·
+      <NuxtLink
+        href="https://twitter.com/atinux"
+        target="_blank"
+        class="text-sm text-neutral-500 hover:text-neutral-700"
+      >
+        Twitter
+      </NuxtLink>
+    </footer>
+  </UContainer>
 </template>
 
 <style lang="postcss">
