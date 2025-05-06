@@ -60,12 +60,13 @@ useSeoMeta({
         <UiButton
           v-if="!loggedIn"
           icon="i-simple-icons-google"
-          label="Login with Google"
           color="neutral"
           size="icon"
           external
           @click="signIn()"
-        />
+        >
+          Login with Google
+        </UiButton>
         <div
           v-else
           class="flex flex-wrap -mx-2 sm:mx-0"
@@ -73,19 +74,19 @@ useSeoMeta({
           <UiButton
             to="/todos"
             icon="i-lucide-list"
-            label="Todos"
-            size="icon"
             :color="$route.path === '/todos' ? 'primary' : 'neutral'"
             variant="ghost"
-          />
+          >
+            Todos
+          </UiButton>
           <UiButton
             to="/optimistic-todos"
             icon="i-lucide-sparkles"
-            label="Optimistic Todos"
-            size="icon"
             :color="$route.path === '/optimistic-todos' ? 'primary' : 'neutral'"
             variant="ghost"
-          />
+          >
+            Optimistic Todos
+          </UiButton>
           <UiDropdownMenu
             v-if="session?.user"
           >
@@ -93,10 +94,10 @@ useSeoMeta({
               <UiButton
                 color="neutral"
                 variant="ghost"
-                size="lg"
                 icon="i-lucide-chevron-down"
               >
                 <UiAvatar
+                  class="size-6"
                   :src="session.user.image"
                   :alt="session.user.name"
                 />
