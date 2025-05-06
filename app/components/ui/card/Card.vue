@@ -17,7 +17,7 @@ const props = defineProps<{
       )
     "
   >
-    <UiCardHeader class="flex justify-between">
+    <UiCardHeader class="flex items-center justify-between">
       <slot name="header" />
     </UiCardHeader>
     <UiCardContent>
