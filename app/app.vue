@@ -97,7 +97,7 @@ useSeoMeta({
                 icon="i-lucide-chevron-down"
               >
                 <UiAvatar
-                  class="size-6"
+                  size="sm"
                   :src="session.user.image"
                   :alt="session.user.name"
                 />
