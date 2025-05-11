@@ -61,7 +61,6 @@ useSeoMeta({
           v-if="!loggedIn"
           icon="i-simple-icons-google"
           color="neutral"
-          size="icon"
           external
           @click="signIn()"
         >
