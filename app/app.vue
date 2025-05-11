@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { DropdownMenuItem } from '#ui/types'
-
-const { loggedIn, user, clear } = useUserSession()
+const { data: session } = await authClient.useSession(useFetch)
+const loggedIn = computed(() => !!session.value)
 const colorMode = useColorMode()
 
 watch(loggedIn, () => {
@@ -15,6 +14,12 @@ const isDarkMode = computed({
   set: () =>
     (colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark')
 })
+
+const signIn = () => {
+  authClient.signIn.social({
+    provider: 'google'
+  })
+}
 
 useHead({
   htmlAttrs: { lang: 'en' },
@@ -30,110 +35,108 @@ useSeoMeta({
   twitterImage: '/social-image.png',
   twitterCard: 'summary_large_image'
 })
-
-const items = [
-  [
-    {
-      label: 'Logout',
-      icon: 'i-lucide-log-out',
-      onSelect: clear
-    }
-  ]
-] satisfies DropdownMenuItem[][]
 </script>
 
 <template>
-  <UApp>
-    <UContainer class="min-h-screen flex flex-col my-4">
-      <div class="mb-2 text-right">
-        <UButton
-          square
-          variant="ghost"
-          color="neutral"
-          :icon="
-            $colorMode.preference === 'dark' || $colorMode.preference === 'system'
-              ? 'i-lucide-moon'
-              : 'i-lucide-sun'
-          "
-          @click="isDarkMode = !isDarkMode"
-        />
-      </div>
+  <div class="max-w-xl mx-auto min-h-screen flex flex-col my-4">
+    <div class="mb-2 text-right">
+      <UiButton
+        variant="ghost"
+        size="icon"
+        :icon="
+          $colorMode.preference === 'dark' || $colorMode.preference === 'system'
+            ? 'i-lucide-moon'
+            : 'i-lucide-sun'
+        "
+        @click="isDarkMode = !isDarkMode"
+      />
+    </div>
 
-      <UCard variant="subtle">
-        <template #header>
-          <h3 class="text-lg font-semibold leading-6">
-            <NuxtLink to="/">
-              Atidone
-            </NuxtLink>
-          </h3>
-          <UButton
-            v-if="!loggedIn"
-            to="/api/auth/github"
-            icon="i-simple-icons-github"
-            label="Login with GitHub"
-            color="neutral"
-            size="xs"
-            external
-          />
-          <div
-            v-else
-            class="flex flex-wrap -mx-2 sm:mx-0"
+    <UiCard>
+      <template #header>
+        <NuxtLink to="/">
+          Atidone
+        </NuxtLink>
+        <UiButton
+          v-if="!loggedIn"
+          icon="i-simple-icons-google"
+          color="neutral"
+          size="icon"
+          external
+          @click="signIn()"
+        >
+          Login with Google
+        </UiButton>
+        <div
+          v-else
+          class="flex flex-wrap -mx-2 sm:mx-0"
+        >
+          <UiButton
+            to="/todos"
+            icon="i-lucide-list"
+            :color="$route.path === '/todos' ? 'primary' : 'neutral'"
+            variant="ghost"
           >
-            <UButton
-              to="/todos"
-              icon="i-lucide-list"
-              label="Todos"
-              :color="$route.path === '/todos' ? 'primary' : 'neutral'"
-              variant="ghost"
-            />
-            <UButton
-              to="/optimistic-todos"
-              icon="i-lucide-sparkles"
-              label="Optimistic Todos"
-              :color="$route.path === '/optimistic-todos' ? 'primary' : 'neutral'"
-              variant="ghost"
-            />
-            <UDropdownMenu
-              v-if="user"
-              :items="items"
-            >
-              <UButton
+            Todos
+          </UiButton>
+          <UiButton
+            to="/optimistic-todos"
+            icon="i-lucide-sparkles"
+            :color="$route.path === '/optimistic-todos' ? 'primary' : 'neutral'"
+            variant="ghost"
+          >
+            Optimistic Todos
+          </UiButton>
+          <UiDropdownMenu
+            v-if="session?.user"
+          >
+            <UiDropdownMenuTrigger as-child>
+              <UiButton
                 color="neutral"
                 variant="ghost"
-                trailing-icon="i-lucide-chevron-down"
+                icon="i-lucide-chevron-down"
               >
-                <UAvatar
-                  :src="`https://github.com/${user.login}.png`"
-                  :alt="user.login"
-                  size="3xs"
+                <UiAvatar
+                  size="sm"
+                  :src="session.user.image"
+                  :alt="session.user.name"
                 />
-                {{ user.login }}
-              </UButton>
-            </UDropdownMenu>
-          </div>
-        </template>
-        <NuxtPage />
-      </UCard>
+                {{ session.user.name }}
+              </UiButton>
+            </UiDropdownMenuTrigger>
+            <UiDropdownMenuContent>
+              <UiDropdownMenuGroup>
+                <UiDropdownMenuItem @select="authClient.signOut()">
+                  <Icon name="i-lucide-log-out" />
+                  Logout
+                </UiDropdownMenuItem>
+              </UiDropdownMenuGroup>
+            </UiDropdownMenuContent>
+          </UiDropdownMenu>
+        </div>
+      </template>
+      <NuxtPage />
+    </UiCard>
 
-      <footer class="text-center mt-2">
-        <NuxtLink
-          href="https://github.com/atinux/atidone"
-          target="_blank"
-          class="text-sm text-neutral-500 hover:text-neutral-700"
-        >
-          GitHub
-        </NuxtLink>
-        ·
-        <NuxtLink
-          href="https://twitter.com/atinux"
-          target="_blank"
-          class="text-sm text-neutral-500 hover:text-neutral-700"
-        >
-          Twitter
-        </NuxtLink>
-      </footer>
-    </UContainer>
-  </UApp>
+    <footer class="text-center mt-2">
+      <NuxtLink
+        href="https://github.com/atinux/atidone"
+        target="_blank"
+        class="text-sm text-neutral-500 hover:text-neutral-700"
+      >
+        GitHub
+      </NuxtLink>
+      ·
+      <NuxtLink
+        href="https://twitter.com/atinux"
+        target="_blank"
+        class="text-sm text-neutral-500 hover:text-neutral-700"
+      >
+        Twitter
+      </NuxtLink>
+    </footer>
+  </div>
+  <UiSonner />
 </template>
 
 <style lang="postcss">

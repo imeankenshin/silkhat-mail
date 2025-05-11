@@ -1,33 +1,25 @@
 <script setup lang="ts">
+import { toast } from 'vue-sonner'
+
 definePageMeta({
   middleware: 'auth'
 })
 const newTodo = ref('')
 
-const toast = useToast()
-const { user } = useUserSession()
+const { data: session } = await authClient.useSession(useFetch)
 const queryCache = useQueryCache()
+const { $trpc } = useNuxtApp()
 
 const { data: todos } = useQuery({
   key: ['todos'],
-  // using $fetch directly doesn't avoid the round trip to the server
-  // when doing SSR
-  // https://github.com/nuxt/nuxt/issues/24813
-  // NOTE: the cast sometimes avoids an "Excessive depth check" TS error
-  query: ({ signal }) => useRequestFetch()('/api/todos', { signal }) as Promise<Todo[]>
+  query: () => $trpc.todos.get.query() as Promise<Todo[]>
 })
 
 const { mutate: addTodo } = useMutation({
   mutation: (title: string) => {
     if (!title.trim()) throw new Error('Title is required')
 
-    return $fetch('/api/todos', {
-      method: 'POST',
-      body: {
-        title,
-        completed: 0
-      }
-    }) as Promise<Todo>
+    return $trpc.todos.add.mutate({ title })
   },
 
   onMutate(title) {
@@ -40,7 +32,7 @@ const { mutate: addTodo } = useMutation({
       // a negative id to differentiate them from the server ones
       id: -Date.now(),
       createdAt: new Date(),
-      userId: user.value!.id
+      userId: session.value!.user.id
     } satisfies Todo
     // we use newTodos to check for the cache consistency
     // a better way would be to save the entry time
@@ -79,28 +71,23 @@ const { mutate: addTodo } = useMutation({
     if (newTodos != null && newTodos === queryCache.getQueryData(['todos'])) {
       queryCache.setQueryData(['todos'], oldTodos)
     }
-
-    if (isNuxtZodError(err)) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const title = (err as any).data.data.issues
-        .map((issue: { message: string }) => issue.message)
-        .join('\n')
-      toast.add({ title, color: 'error' })
+    if (isTRPCClientError(err) && err.data?.issues) {
+      const title = err.data.issues.map(issue => issue.message).join('\n')
+      if (title)
+        toast.error(title)
     }
     else {
       console.error(err)
-      toast.add({ title: 'Unexpected Error', color: 'error' })
+      toast.error('Unexpected Error')
     }
   }
 })
 
 const { mutate: toggleTodo } = useMutation({
   mutation: (todo: Todo) =>
-    $fetch(`/api/todos/${todo.id}`, {
-      method: 'PATCH',
-      body: {
-        completed: Number(!todo.completed)
-      }
+    $trpc.todos.update.mutate({
+      id: todo.id,
+      values: { completed: Number(!todo.completed) }
     }),
 
   onMutate(todo) {
@@ -132,12 +119,12 @@ const { mutate: toggleTodo } = useMutation({
     }
 
     console.error(err)
-    toast.add({ title: 'Unexpected Error', color: 'error' })
+    toast.error('Unexpected Error')
   }
 })
 
 const { mutate: deleteTodo } = useMutation({
-  mutation: (todo: Todo) => $fetch(`/api/todos/${todo.id}`, { method: 'DELETE' }),
+  mutation: (todo: Todo) => $trpc.todos.delete.mutate({ id: todo.id }),
 
   onMutate(todo) {
     const oldTodos = queryCache.getQueryData<Todo[]>(['todos']) || []
@@ -165,7 +152,7 @@ const { mutate: deleteTodo } = useMutation({
     }
 
     console.error(err)
-    toast.add({ title: 'Unexpected Error', color: 'error' })
+    toast.error('Unexpected Error')
   }
 })
 </script>
@@ -176,17 +163,16 @@ const { mutate: deleteTodo } = useMutation({
     @submit.prevent="addTodo(newTodo)"
   >
     <div class="flex items-center gap-2">
-      <UInput
+      <UiInput
         v-model="newTodo"
         name="todo"
         class="flex-1"
         placeholder="Make a Nuxt demo"
         autocomplete="off"
         autofocus
-        :ui="{ wrapper: 'flex-1' }"
       />
 
-      <UButton
+      <UiButton
         type="submit"
         icon="i-lucide-plus"
         :disabled="newTodo.trim().length === 0"
@@ -207,16 +193,16 @@ const { mutate: deleteTodo } = useMutation({
           }"
         >{{ todo.title }}</span>
 
-        <USwitch
+        <UiSwitch
           :model-value="Boolean(todo.completed)"
           :disabled="todo.id < 0"
           @update:model-value="toggleTodo(todo)"
         />
 
-        <UButton
+        <UiButton
           color="error"
-          variant="soft"
-          size="xs"
+          variant="ghost"
+          size="icon"
           icon="i-lucide-x"
           :disabled="todo.id < 0"
           @click="deleteTodo(todo)"

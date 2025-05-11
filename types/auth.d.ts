@@ -1,7 +1,4 @@
-declare module '#auth-utils' {
-  interface User {
-    id: number
-    login: string
-  }
-}
-export {}
+import type { User as BetterAuthUser, Session as BetterAuthSession } from 'better-auth'
+
+export type User = BetterAuthUser
+export type UserSession = BetterAuthSession

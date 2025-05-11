@@ -1,38 +1,30 @@
 <script setup lang="ts">
+import { toast } from 'vue-sonner'
+
 definePageMeta({
   middleware: 'auth'
 })
 const newTodo = ref('')
 const newTodoInput = useTemplateRef('new-todo')
 
-const toast = useToast()
 const queryCache = useQueryCache()
+const { $trpc } = useNuxtApp()
 
 const { data: todos } = useQuery({
   key: ['todos'],
-  // NOTE: the cast sometimes avoids an "Excessive depth check" TS error
-  // using $fetch directly doesn't avoid the round trip to the server
-  // when doing SSR
-  // https://github.com/nuxt/nuxt/issues/24813
-  query: () => useRequestFetch()('/api/todos') as Promise<Todo[]>
+  query: () => $trpc.todos.get.query() as Promise<Todo[]>
 })
 
 const { mutate: addTodo, isLoading: loading } = useMutation({
   mutation: (title: string) => {
     if (!title.trim()) throw new Error('Title is required')
 
-    return $fetch('/api/todos', {
-      method: 'POST',
-      body: {
-        title,
-        completed: 0
-      }
-    })
+    return $trpc.todos.add.mutate({ title })
   },
 
   async onSuccess(todo) {
     await queryCache.invalidateQueries({ key: ['todos'] })
-    toast.add({ title: `Todo "${todo.title}" created.` })
+    toast.success(`Todo "${todo.title}" created.`)
   },
 
   onSettled() {
@@ -43,33 +35,28 @@ const { mutate: addTodo, isLoading: loading } = useMutation({
     nextTick()
       .then(() => nextTick())
       .then(() => {
-        newTodoInput.value?.input?.focus()
+        newTodoInput.value?.inputRef.focus()
       })
   },
 
   onError(err) {
-    if (isNuxtZodError(err)) {
-      const title = err.data?.data.issues
-        .map(issue => issue.message)
-        .join('\n')
-      if (title) {
-        toast.add({ title, color: 'red' })
-      }
+    if (isTRPCClientError(err) && err.data?.issues) {
+      const title = err.data.issues.map(issue => issue.message).join('\n')
+      if (title)
+        toast.error(title)
     }
     else {
       console.error(err)
-      toast.add({ title: 'Unexpected Error', color: 'red' })
+      toast.error('Unexpected Error')
     }
   }
 })
 
 const { mutate: toggleTodo } = useMutation({
   mutation: (todo: Todo) =>
-    $fetch(`/api/todos/${todo.id}`, {
-      method: 'PATCH',
-      body: {
-        completed: Number(!todo.completed)
-      }
+    $trpc.todos.update.mutate({
+      id: todo.id,
+      values: { completed: Number(!todo.completed) }
     }),
 
   async onSuccess() {
@@ -79,11 +66,11 @@ const { mutate: toggleTodo } = useMutation({
 
 const { mutate: deleteTodo } = useMutation({
   mutation: (todo: Todo) =>
-    $fetch(`/api/todos/${todo.id}`, { method: 'DELETE' }),
+    $trpc.todos.delete.mutate({ id: todo.id }),
 
   async onSuccess(_result, todo) {
     await queryCache.invalidateQueries({ key: ['todos'] })
-    toast.add({ title: `Todo "${todo.title}" deleted.` })
+    toast.success(`Todo "${todo.title}" deleted.`)
   }
 })
 </script>
@@ -94,7 +81,7 @@ const { mutate: deleteTodo } = useMutation({
     @submit.prevent="addTodo(newTodo)"
   >
     <div class="flex items-center gap-2">
-      <UInput
+      <UiInput
         ref="new-todo"
         v-model="newTodo"
         name="todo"
@@ -103,10 +90,10 @@ const { mutate: deleteTodo } = useMutation({
         placeholder="Make a Nuxt demo"
         autocomplete="off"
         autofocus
-        :ui="{ wrapper: 'flex-1' }"
+        :ui="{ base: 'flex-1' }"
       />
 
-      <UButton
+      <UiButton
         type="submit"
         icon="i-lucide-plus"
         :loading="loading"
@@ -125,15 +112,15 @@ const { mutate: deleteTodo } = useMutation({
           :class="[todo.completed ? 'line-through text-gray-500' : '']"
         >{{ todo.title }}</span>
 
-        <USwitch
+        <UiSwitch
           :model-value="Boolean(todo.completed)"
           @update:model-value="toggleTodo(todo)"
         />
 
-        <UButton
+        <UiButton
           color="error"
-          variant="soft"
-          size="xs"
+          variant="ghost"
+          size="icon"
           icon="i-lucide-x"
           @click="deleteTodo(todo)"
         />
