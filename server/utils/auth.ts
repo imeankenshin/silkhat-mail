@@ -4,7 +4,8 @@ import { useDB } from './db'
 
 export const auth = betterAuth({
   database: drizzleAdapter(useDB(), {
-    provider: 'pg'
+    provider: 'pg',
+    debugLogs: true
   }),
   socialProviders: {
     google: {
