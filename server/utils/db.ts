@@ -7,7 +7,8 @@ export { sql, eq, and, or } from 'drizzle-orm'
 export const tables = schema
 
 export function useDB() {
-  const client = postgres(process.env.DATABASE_URL!, {
+  const config = useRuntimeConfig()
+  const client = postgres(config.databaseUrl!, {
     prepare: false
   })
   return drizzle({ client, schema })
