@@ -32,10 +32,10 @@ export default defineNuxtConfig({
     classSuffix: ''
   },
   runtimeConfig: {
-    googleClientId: process.env.GOOGLE_CLIENT_ID || '',
-    googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    googleRedirectUrl: process.env.GOOGLE_REDIRECT_URL || '',
-    databaseUrl: process.env.DATABASE_URL || ''
+    googleClientId: '',
+    googleClientSecret: '',
+    googleRedirectUrl: '',
+    databaseUrl: ''
   },
   build: {
     transpile: ['trpc-nuxt']
