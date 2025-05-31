@@ -31,6 +31,12 @@ export default defineNuxtConfig({
     storage: 'localStorage',
     classSuffix: ''
   },
+  runtimeConfig: {
+    googleClientId: '',
+    googleClientSecret: '',
+    googleRedirectUrl: '',
+    databaseUrl: ''
+  },
   build: {
     transpile: ['trpc-nuxt']
   },
@@ -60,7 +66,7 @@ export default defineNuxtConfig({
       catch (error) {
         logger.error('Database migration failed:', error)
       }
-      if (process.env.NODE_ENV !== 'development') return
+      if (!import.meta.dev) return
       try {
         const studio = exec('pnpm drizzle-kit studio')
         // kill studio on exit
