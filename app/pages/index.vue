@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-4 p-6">
     <p class="font-medium">
       Welcome to Atidone.
     </p>
