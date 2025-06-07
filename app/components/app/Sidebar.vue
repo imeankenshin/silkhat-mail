@@ -6,41 +6,56 @@ const logIn = () => {
     provider: 'google'
   })
 }
+const commonSidebarGroup = [
+  {
+    name: 'Inbox',
+    icon: 'material-symbols:inbox-rounded',
+    to: '/'
+  },
+  {
+    name: 'Starred',
+    icon: 'material-symbols:star-rounded',
+    to: '/'
+  },
+  {
+    name: 'Sent',
+    icon: 'material-symbols:send-rounded',
+    to: '/'
+  },
+  {
+    name: 'Drafts',
+    icon: 'material-symbols:drafts-rounded',
+    to: '/'
+  },
+  {
+    name: 'Promotions',
+    icon: 'material-symbols:sell',
+    to: '/'
+  }
+]
 </script>
 
 <template>
   <UiSidebar>
-    <UiSidebarHeader class="p-4">
-      <NuxtLink to="/">
-        Atidone
-      </NuxtLink>
-    </UiSidebarHeader>
+    <UiSidebarHeader class="p-4" />
     <UiSidebarContent>
       <UiSidebarGroup>
         <UiSidebarGroupContent>
           <UiSidebarMenu>
-            <UiSidebarMenuItem>
+            <UiSidebarMenuItem
+              v-for="item in commonSidebarGroup"
+              :key="item.to"
+            >
               <UiSidebarMenuButton as-child>
-                <NuxtLink to="/todos">
+                <NuxtLink :to="item.to">
                   <Icon
                     mode="svg"
-                    name="i-lucide-list"
+                    :name="item.icon"
                   />
-                  Todos
+                  {{ item.name }}
                 </NuxtLink>
               </uisidebarmenubutton>
             </UiSidebarMenuItem>
-            <UiSidebarMenuItem>
-              <UiSidebarMenuButton as-child>
-                <NuxtLink to="/optimistic-todos">
-                  <Icon
-                    mode="svg"
-                    name="i-lucide-sparkles"
-                  />
-                  Optimistic Todos
-                </NuxtLink>
-              </UiSidebarMenuButton>
-            </uisidebarmenuitem>
           </UiSidebarMenu>
         </UiSidebarGroupContent>
       </UiSidebarGroup>
