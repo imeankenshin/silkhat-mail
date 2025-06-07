@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const { data: session } = await authClient.useSession(useFetch)
 const loggedIn = computed(() => !!session.value)
-const signIn = () => {
+const logIn = () => {
   authClient.signIn.social({
     provider: 'google'
   })
@@ -10,7 +10,7 @@ const signIn = () => {
 
 <template>
   <UiSidebar>
-    <UiSidebarHeader class="p-2">
+    <UiSidebarHeader class="p-4">
       <NuxtLink to="/">
         Atidone
       </NuxtLink>
@@ -49,7 +49,7 @@ const signIn = () => {
         icon="i-simple-icons-google"
         color="neutral"
         external
-        @click="signIn()"
+        @click="logIn()"
       >
         Login with Google
       </UiButton>
