@@ -7,7 +7,7 @@ const props = withDefaults(defineProps<PrimitiveProps & {
   showOnHover?: boolean
   class?: HTMLAttributes['class']
 }>(), {
-  as: 'button',
+  as: 'button'
 })
 </script>
 
@@ -24,7 +24,7 @@ const props = withDefaults(defineProps<PrimitiveProps & {
       'group-data-[collapsible=icon]:hidden',
       showOnHover
         && 'peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0',
-      props.class,
+      props.class
     )"
     :as="as"
     :as-child="asChild"

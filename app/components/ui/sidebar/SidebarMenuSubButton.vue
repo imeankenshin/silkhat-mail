@@ -10,7 +10,7 @@ const props = withDefaults(defineProps<PrimitiveProps & {
   class?: HTMLAttributes['class']
 }>(), {
   as: 'a',
-  size: 'md',
+  size: 'md'
 })
 </script>
 
@@ -28,7 +28,7 @@ const props = withDefaults(defineProps<PrimitiveProps & {
       size === 'sm' && 'text-xs',
       size === 'md' && 'text-sm',
       'group-data-[collapsible=icon]:hidden',
-      props.class,
+      props.class
     )"
   >
     <slot />
