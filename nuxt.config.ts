@@ -72,9 +72,6 @@ export default defineNuxtConfig({
           const migrationTime = performance.measure('migration', 'migration-start', 'migration-end')
           logger.success(`Database migrations completed in ${Math.round(migrationTime.duration)}ms`)
         })
-        migration.on('message', (message) => {
-          logger.info('Database migration:', message)
-        })
         migration.on('error', (error) => {
           logger.error('Database migration failed:', error)
         })
@@ -91,9 +88,6 @@ export default defineNuxtConfig({
         // kill studio on exit
         process.on('exit', () => {
           studio.kill()
-        })
-        studio.on('message', (message) => {
-          logger.info('Drizzle Studio:', message)
         })
         studio.on('error', (error) => {
           logger.error('Drizzle Studio failed:', error)
