@@ -3,94 +3,107 @@
 const mails = ref([
   {
     id: 1,
-    sender: 'ツジ 佐介',
-    subject: '今夜の社交ダンスについて',
+    sender: 'りんご銀行',
+    subject: 'デビットカードご利用のお知らせ',
     isStarred: false,
-    avatar: null
+    avatar: null,
+    date: '2024-07-01T10:00:00Z'
   },
   {
     id: 2,
-    sender: 'ツジ 佐介',
-    subject: '今夜の社交ダンスについて',
-    isStarred: false,
-    avatar: null
+    sender: 'Apple Bank',
+    subject: 'Debit Card Usage Notification',
+    isStarred: true,
+    avatar: null,
+    date: '2024-07-01T11:30:00Z'
   },
   {
     id: 3,
-    sender: 'ツジ 佐介',
-    subject: '今夜の社交ダンスについて',
+    sender: '田中商店',
+    subject: 'ご注文ありがとうございます',
     isStarred: false,
-    avatar: null
+    avatar: null,
+    date: '2024-07-02T09:15:00Z'
   },
   {
     id: 4,
-    sender: 'ツジ 佐介',
-    subject: '今夜の社交ダンスについて',
+    sender: 'Tanaka Store',
+    subject: 'Thank you for your order',
     isStarred: false,
-    avatar: null
+    avatar: null,
+    date: '2024-07-02T14:00:00Z'
   },
   {
     id: 5,
-    sender: 'ツジ 佐介',
-    subject: '今夜の社交ダンスについて',
-    isStarred: false,
-    avatar: null
+    sender: 'サポートチーム',
+    subject: 'パスワードリセットのご案内',
+    isStarred: true,
+    avatar: null,
+    date: '2024-07-03T16:45:00Z'
   },
   {
     id: 6,
-    sender: 'ツジ 佐介',
-    subject: '今夜の社交ダンスについて',
+    sender: 'Support Team',
+    subject: 'Password Reset Instructions',
     isStarred: false,
-    avatar: null
+    avatar: null,
+    date: '2024-07-03T17:00:00Z'
   },
   {
     id: 7,
-    sender: 'ツジ 佐介',
-    subject: '今夜の社交ダンスについて',
+    sender: 'ニュースレター',
+    subject: '今週の注目記事',
     isStarred: false,
-    avatar: null
+    avatar: null,
+    date: '2024-07-04T08:00:00Z'
   },
   {
     id: 8,
-    sender: 'ツジ 佐介',
-    subject: '今夜の社交ダンスについて',
+    sender: 'Newsletter',
+    subject: 'This Week\'s Featured Articles',
     isStarred: false,
-    avatar: null
+    avatar: null,
+    date: '2024-07-04T08:30:00Z'
   },
   {
     id: 9,
-    sender: 'ツジ 佐介',
-    subject: '今夜の社交ダンスについて',
-    isStarred: false,
-    avatar: null
+    sender: 'イベント事務局',
+    subject: 'イベント参加登録完了のお知らせ',
+    isStarred: true,
+    avatar: null,
+    date: '2024-07-04T10:00:00Z'
   },
   {
     id: 10,
-    sender: 'ツジ 佐介',
-    subject: '今夜の社交ダンスについて',
+    sender: 'Event Secretariat',
+    subject: 'Event Registration Confirmation',
     isStarred: false,
-    avatar: null
+    avatar: null,
+    date: '2024-07-04T10:15:00Z'
   },
   {
     id: 11,
-    sender: 'ツジ 佐介',
-    subject: '今夜の社交ダンスについて',
+    sender: '人事部',
+    subject: '月次報告書提出のお願い',
     isStarred: false,
-    avatar: null
+    avatar: null,
+    date: '2024-07-05T09:00:00Z'
   },
   {
     id: 12,
-    sender: 'ツジ 佐介',
-    subject: '今夜の社交ダンスについて',
+    sender: 'HR Department',
+    subject: 'Monthly Report Submission Request',
     isStarred: false,
-    avatar: null
+    avatar: null,
+    date: '2024-07-05T09:30:00Z'
   },
   {
     id: 13,
-    sender: 'ツジ 佐介',
-    subject: '今夜の社交ダンスについて',
-    isStarred: false,
-    avatar: null
+    sender: 'システム管理者',
+    subject: 'システムメンテナンスのお知らせ',
+    isStarred: true,
+    avatar: null,
+    date: '2024-07-05T11:00:00Z'
   }
 ])
 
