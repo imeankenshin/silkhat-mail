@@ -53,16 +53,24 @@ export default defineNuxtConfig({
   hooks: {
     'nitro:init': async () => {
       // drizzle ORMのマイグレーションを自動実行
-      const { exec } = await import('child_process')
+      const { spawn } = await import('child_process')
+      const { performance } = await import('perf_hooks')
       try {
         // マイグレーションの実行
         // logger.info('Running database migrations...')
         // await migrate(db, { migrationsFolder: './server/database/migrations' })
         // logger.success('Database migrations completed successfully')
-        logger.info('Running database migrations...')
-        const migration = exec('pnpm drizzle-kit migrate')
+        const migration = spawn('pnpm', ['drizzle-kit', 'migrate'])
+        process.on('exit', () => {
+          migration.kill()
+        })
+        migration.on('spawn', () => {
+          performance.mark('migration-start')
+        })
         migration.on('exit', () => {
-          logger.success('Database migrations completed successfully')
+          performance.mark('migration-end')
+          const migrationTime = performance.measure('migration', 'migration-start', 'migration-end')
+          logger.success(`Database migrations completed in ${Math.round(migrationTime.duration)}ms`)
         })
         migration.on('error', (error) => {
           logger.error('Database migration failed:', error)
@@ -73,11 +81,25 @@ export default defineNuxtConfig({
       }
       if (!import.meta.dev) return
       try {
-        const studio = exec('pnpm drizzle-kit studio')
-        // kill studio on exit
-        process.on('exit', () => {
-          studio.kill()
+        const studio = spawn('pnpm', ['drizzle-kit', 'studio'])
+        studio.on('spawn', () => {
+          logger.info('Drizzle Studio started')
         })
+
+        const cleanupStudio = () => {
+          try {
+            if (!studio.killed) {
+              studio.kill()
+            }
+          }
+          catch (error) {
+            logger.error('Failed to kill studio process:', error)
+          }
+        }
+
+        process.on('exit', cleanupStudio)
+        process.on('SIGINT', cleanupStudio)
+        process.on('SIGTERM', cleanupStudio)
       }
       catch (error) {
         logger.error('Drizzle Studio failed:', error)

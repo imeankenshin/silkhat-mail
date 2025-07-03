@@ -77,7 +77,7 @@ const { mutate: deleteTodo } = useMutation({
 
 <template>
   <form
-    class="flex flex-col gap-4"
+    class="flex flex-col gap-4 p-6"
     @submit.prevent="addTodo(newTodo)"
   >
     <div class="flex items-center gap-2">
