@@ -85,13 +85,21 @@ export default defineNuxtConfig({
         studio.on('spawn', () => {
           logger.info('Drizzle Studio started')
         })
-        // kill studio on exit
-        process.on('exit', () => {
-          studio.kill()
-        })
-        studio.on('error', (error) => {
-          logger.error('Drizzle Studio failed:', error)
-        })
+
+        const cleanupStudio = () => {
+          try {
+            if (!studio.killed) {
+              studio.kill()
+            }
+          }
+          catch (error) {
+            logger.error('Failed to kill studio process:', error)
+          }
+        }
+
+        process.on('exit', cleanupStudio)
+        process.on('SIGINT', cleanupStudio)
+        process.on('SIGTERM', cleanupStudio)
       }
       catch (error) {
         logger.error('Drizzle Studio failed:', error)
