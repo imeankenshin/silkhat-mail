@@ -54,7 +54,7 @@ const commonSidebarGroup = [
                   />
                   {{ item.name }}
                 </NuxtLink>
-              </uisidebarmenubutton>
+              </UiSidebarMenuButton>
             </UiSidebarMenuItem>
           </UiSidebarMenu>
         </UiSidebarGroupContent>
