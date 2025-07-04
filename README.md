@@ -1,6 +1,6 @@
 # Silk Hat Mail
 
-An open-source mail management app, that makes you want to use.
+An open-source mail management app you’ll actually enjoy using.
 
 ## Requirements
 
@@ -21,6 +21,11 @@ pnpm install
 
 # Run the app
 pnpm run dev
+
+# The app will be available at http://localhost:3000
+
+# Build for production
+pnpm run build && pnpm start
 ```
 
 ## Contributing
