@@ -1,18 +1,56 @@
 <script setup lang="ts">
+import { toast } from 'vue-sonner'
+
 // サンプルメールデータ
 const { $trpc } = useNuxtApp()
-const { data: mails, error } = $trpc.mails.get.useQuery({})
+const { data: mails } = useQuery({
+  key: ['mails'],
+  query: () => $trpc.mails.get.query({})
+})
+const queryCache = useQueryCache()
 
-const toggleStar = (mailId: string) => {
-  const mail = mails.value?.find(m => m.id === mailId)
-  if (mail) {
-    console.log(mail)
+const { mutate: toggleStar } = useMutation({
+  mutation: (mail: Mail) =>
+    $trpc.mails.toggleStar.mutate({
+      id: mail.id
+    }),
+
+  onMutate(mail) {
+    const mails = queryCache.getQueryData<Mail[]>(['mails']) || []
+    const mailIndex = mails.findIndex(m => m.id === mail.id)
+    let newMails = mails
+    if (mailIndex >= 0) {
+      newMails = mails.toSpliced(mailIndex, 1, {
+        ...mail,
+        labels: mail.labels.includes('STARRED') ? [] : ['STARRED']
+      })
+      queryCache.setQueryData(['mails'], newMails)
+    }
+
+    queryCache.cancelQueries({ key: ['mails'], exact: true })
+
+    return { oldMails: mails, newMails }
+  },
+
+  onSettled() {
+    // always refetch the mails after a mutation
+    queryCache.invalidateQueries({ key: ['mails'], exact: true })
+  },
+
+  onError(err, mail, { oldMails, newMails }) {
+    // oldMails can be undefined if onMutate errors
+    if (newMails != null && newMails === queryCache.getQueryData(['mails'])) {
+      queryCache.setQueryData(['mails'], oldMails)
+    }
+
+    console.error(err)
+    toast.error('Unexpected Error')
   }
-}
+})
 
 // デバッグ用
 watchEffect(() => console.log(
-  error.value
+  mails.value
 ))
 </script>
 
@@ -34,11 +72,11 @@ watchEffect(() => console.log(
             variant="ghost"
             size="sm"
             class="h-8 w-8 p-0 hover:bg-transparent"
-            @click.stop="toggleStar(mail.id)"
+            @click.stop="toggleStar(mail)"
           >
             <Icon
-              :name="mail.labels.includes('Stared') ? 'material-symbols:star-rounded' : 'material-symbols:star-outline-rounded'"
-              :class="mail.labels.includes('Stared') ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'"
+              :name="mail.labels.includes('STARRED') ? 'material-symbols:star-rounded' : 'material-symbols:star-outline-rounded'"
+              :class="mail.labels.includes('STARRED') ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'"
               size="1.5em"
             />
           </UiButton>

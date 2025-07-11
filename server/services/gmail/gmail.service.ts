@@ -1,3 +1,4 @@
+import type { gmail_v1 } from 'googleapis'
 import { google } from 'googleapis'
 import type { IGmailService, GetMessagesOptions } from './gmail.interface'
 
@@ -37,7 +38,7 @@ export class GmailService implements IGmailService {
           userId: 'me',
           id: message.id!,
           format: 'metadata',
-          metadataHeaders: ['From', 'To', 'Subject', 'Date', 'Labels']
+          metadataHeaders: ['From', 'To', 'Subject', 'Date']
         })
 
         return this.#formatMessage(messageResponse.data)
@@ -47,16 +48,46 @@ export class GmailService implements IGmailService {
     return success(messages)
   }
 
-  #formatMessage(messageData: {
-    id?: string | null
-    threadId?: string | null
-    snippet?: string | null
-    payload?: {
-      headers?: Array<{ name?: string | null, value?: string | null }> | null
-    } | null
-    internalDate?: string | null
-    sizeEstimate?: number | null
-  }): Mail {
+  async toggleStar(accessToken: string, messageId: string) {
+    const auth = new google.auth.OAuth2()
+    auth.setCredentials({ access_token: accessToken })
+
+    const gmail = google.gmail({ version: 'v1', auth })
+
+    const { data: message, error: getMessageError } = await tryCatch(
+      gmail.users.messages
+        .get({
+          userId: 'me',
+          id: messageId,
+          format: 'metadata',
+          metadataHeaders: ['Labels']
+        })
+        .then(res => res.data)
+    )
+    if (getMessageError !== null) {
+      return failure(getMessageError)
+    }
+
+    const requestBodyKey = message.labelIds?.includes('STARRED')
+      ? 'removeLabelIds'
+      : 'addLabelIds'
+    const { error: toggleStarError } = await tryCatch(
+      gmail.users.messages.modify({
+        userId: 'me',
+        id: messageId,
+        requestBody: {
+          [requestBodyKey]: ['STARRED']
+        }
+      })
+    )
+    if (toggleStarError !== null) {
+      return failure(toggleStarError)
+    }
+
+    return success(undefined)
+  }
+
+  #formatMessage(messageData: gmail_v1.Schema$Message): Mail {
     const headers
       = messageData.payload?.headers
         ?.filter(
@@ -83,7 +114,7 @@ export class GmailService implements IGmailService {
       to,
       subject,
       date,
-      labels: headers.find(h => h.name === 'Labels')?.value?.split(',') || []
+      labels: messageData.labelIds || []
     }
   }
 
