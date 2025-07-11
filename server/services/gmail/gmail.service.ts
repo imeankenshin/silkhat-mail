@@ -1,5 +1,10 @@
 import { google } from 'googleapis'
-import type { IGmailService, GetMessagesOptions, GmailMessage } from './gmail.interface'
+import type { IGmailService, GetMessagesOptions } from './gmail.interface'
+
+const formattableFromPatterns = [
+  /^"([^"]+)" <([^>]+)>$/,
+  /^([^<]+) <([^>]+)>$/
+] as const
 
 export class GmailService implements IGmailService {
   async getMessages(accessToken: string, options: GetMessagesOptions = {}) {
@@ -9,12 +14,14 @@ export class GmailService implements IGmailService {
     const gmail = google.gmail({ version: 'v1', auth })
 
     // メッセージIDのリストを取得
-    const { data: listResponse, error } = await tryCatch(gmail.users.messages.list({
-      userId: 'me',
-      maxResults: options.maxResults || 10,
-      pageToken: options.pageToken,
-      q: options.q
-    }))
+    const { data: listResponse, error } = await tryCatch(
+      gmail.users.messages.list({
+        userId: 'me',
+        maxResults: options.maxResults || 10,
+        pageToken: options.pageToken,
+        q: options.q
+      })
+    )
     if (error !== null) {
       return failure(error)
     }
@@ -30,7 +37,7 @@ export class GmailService implements IGmailService {
           userId: 'me',
           id: message.id!,
           format: 'metadata',
-          metadataHeaders: ['From', 'To', 'Subject', 'Date']
+          metadataHeaders: ['From', 'To', 'Subject', 'Date', 'Labels']
         })
 
         return this.#formatMessage(messageResponse.data)
@@ -49,24 +56,52 @@ export class GmailService implements IGmailService {
     } | null
     internalDate?: string | null
     sizeEstimate?: number | null
-  }): GmailMessage {
-    const headers = messageData.payload?.headers?.filter(
-      (header): header is { name: string, value: string } =>
-        header.name != null && header.value != null
-    ).map(header => ({
-      name: header.name,
-      value: header.value
-    })) || []
+  }): Mail {
+    const headers
+      = messageData.payload?.headers
+        ?.filter(
+          (header): header is { name: string, value: string } =>
+            header.name != null && header.value != null
+        )
+        .map(header => ({
+          name: header.name,
+          value: header.value
+        })) || []
 
+    const from = this.#formatFrom(
+      headers.find(h => h.name === 'From')?.value || null
+    )
+    const to = headers.find(h => h.name === 'To')?.value || null
+    const subject = headers.find(h => h.name === 'Subject')?.value || null
+    const date = headers.find(h => h.name === 'Date')?.value || null
     return {
       id: messageData.id || '',
       threadId: messageData.threadId || '',
       snippet: messageData.snippet || '',
-      payload: {
-        headers
-      },
-      internalDate: messageData.internalDate || '',
-      sizeEstimate: messageData.sizeEstimate || 0
+      sizeEstimate: messageData.sizeEstimate || 0,
+      from,
+      to,
+      subject,
+      date,
+      labels: headers.find(h => h.name === 'Labels')?.value?.split(',') || []
     }
+  }
+
+  /**
+   * @example
+   * formatFrom('Kenshin Omura <kenshin.omura@gmail.com>')
+   * // => { name: 'Kenshin Omura', email: 'kenshin.omura@gmail.com' }
+   * formatFrom('kenshin.omura@gmail.com')
+   * // => 'kenshin.omura@gmail.com'
+   * formatFrom('"Kenshin Omura" <kenshin.omura@gmail.com>')
+   * // => { name: 'Kenshin Omura', email: 'kenshin.omura@gmail.com' }
+   */
+  #formatFrom(from: string | null) {
+    if (!from) return null
+    for (const pattern of formattableFromPatterns) {
+      const match = from.match(pattern)
+      if (match) return match[1]
+    }
+    return from
   }
 }

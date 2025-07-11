@@ -6,7 +6,7 @@ const { data: mails, error } = $trpc.mails.get.useQuery({})
 const toggleStar = (mailId: string) => {
   const mail = mails.value?.find(m => m.id === mailId)
   if (mail) {
-    // TODO: スターを変更する
+    console.log(mail)
   }
 }
 
@@ -37,15 +37,15 @@ watchEffect(() => console.log(
             @click.stop="toggleStar(mail.id)"
           >
             <Icon
-              :name="false ? 'material-symbols:star-rounded' : 'material-symbols:star-outline-rounded'"
-              :class="false ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'"
+              :name="mail.labels.includes('Stared') ? 'material-symbols:star-rounded' : 'material-symbols:star-outline-rounded'"
+              :class="mail.labels.includes('Stared') ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'"
               size="1.5em"
             />
           </UiButton>
 
           <!-- アバター -->
           <UiAvatar
-            :alt="mail.payload.headers.find(h => h.name === 'From')?.value"
+            :alt="mail.from || ''"
             size="sm"
             class="h-10 w-10 bg-muted"
           />
@@ -54,10 +54,10 @@ watchEffect(() => console.log(
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2">
               <span class="font-medium text-foreground truncate">
-                {{ mail.payload.headers.find(h => h.name === 'From')?.value }}
+                {{ mail.from }}
               </span>
               <span class="text-muted-foreground truncate">
-                {{ mail.payload.headers.find(h => h.name === 'Subject')?.value }}
+                {{ mail.subject }}
               </span>
             </div>
           </div>

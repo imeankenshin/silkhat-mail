@@ -2,12 +2,10 @@ export type Mail = {
   id: string
   threadId: string
   snippet: string
-  payload: {
-    headers: {
-      name: string
-      value: string
-    }[]
-  }
-  internalDate: string
+  from: string | null
+  to: string | null
+  subject: string | null
+  date: string | null
   sizeEstimate: number
+  labels: string[]
 }
