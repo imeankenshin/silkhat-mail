@@ -10,18 +10,13 @@ export type Failure<E> = {
 
 export type Result<T, E> = Sucess<T> | Failure<E>
 
-export function tryCatch<T, E extends Error = Error>(promise: Promise<T>): Promise<Result<T, E>>
-export function tryCatch<T, E extends Error = Error>(value: T): Result<T, E>
-export function tryCatch<T, E extends Error = Error>(
-  maybePromise: T
-): Promise<Result<T, E>> | Result<T, E> {
+export async function tryCatch<T, E extends Error>(promise: Promise<T>): Promise<Result<T, E>> {
   try {
-    if (maybePromise instanceof Promise)
-      return maybePromise.then(success)
-    return success(maybePromise)
+    const data = await promise
+    return success(data)
   }
   catch (error) {
-    if (failure instanceof Error)
+    if (error instanceof Error)
       return failure(error as E)
     return failure(new Error(String(error)) as E)
   }
