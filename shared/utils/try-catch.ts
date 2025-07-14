@@ -1,4 +1,4 @@
-export type Sucess<T> = {
+export type Success<T> = {
   error: null
   data: T
 }
@@ -8,7 +8,7 @@ export type Failure<E> = {
   data: null
 }
 
-export type Result<T, E> = Sucess<T> | Failure<E>
+export type Result<T, E> = Success<T> | Failure<E>
 
 export async function tryCatch<T, E extends Error>(promise: Promise<T>): Promise<Result<T, E>> {
   try {
@@ -22,7 +22,7 @@ export async function tryCatch<T, E extends Error>(promise: Promise<T>): Promise
   }
 }
 
-export function success<T>(data: T): Sucess<T> {
+export function success<T>(data: T): Success<T> {
   return {
     error: null,
     data
