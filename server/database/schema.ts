@@ -1,12 +1,4 @@
-import { boolean, timestamp, pgTable, text, integer, serial } from 'drizzle-orm/pg-core'
-
-export const todos = pgTable('todos', {
-  id: serial('id').primaryKey(),
-  userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }), // GitHub Id
-  title: text('title').notNull(),
-  completed: integer('completed').notNull(),
-  createdAt: timestamp('created_at').notNull()
-})
+import { boolean, timestamp, pgTable, text } from 'drizzle-orm/pg-core'
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
