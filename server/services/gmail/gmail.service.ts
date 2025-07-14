@@ -87,6 +87,47 @@ export class GmailService implements IGmailService {
     return success(undefined)
   }
 
+  async archive(accessToken: string, messageId: string) {
+    const auth = new google.auth.OAuth2()
+    auth.setCredentials({ access_token: accessToken })
+
+    const gmail = google.gmail({ version: 'v1', auth })
+
+    const { error: archiveError } = await tryCatch(
+      gmail.users.messages.modify({
+        userId: 'me',
+        id: messageId,
+        requestBody: {
+          removeLabelIds: ['INBOX']
+        }
+      })
+    )
+    if (archiveError !== null) {
+      return failure(archiveError)
+    }
+
+    return success(undefined)
+  }
+
+  async trash(accessToken: string, messageId: string) {
+    const auth = new google.auth.OAuth2()
+    auth.setCredentials({ access_token: accessToken })
+
+    const gmail = google.gmail({ version: 'v1', auth })
+
+    const { error: trashError } = await tryCatch(
+      gmail.users.messages.trash({
+        userId: 'me',
+        id: messageId
+      })
+    )
+    if (trashError !== null) {
+      return failure(trashError)
+    }
+
+    return success(undefined)
+  }
+
   #formatMessage(messageData: gmail_v1.Schema$Message): Mail {
     const headers
       = messageData.payload?.headers

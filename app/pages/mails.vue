@@ -48,9 +48,84 @@ const { mutate: toggleStar } = useMutation({
   }
 })
 
+const { mutate: archive } = useMutation({
+  mutation: (mail: Mail) =>
+    $trpc.mails.archive.mutate({
+      id: mail.id
+    }),
+
+  onMutate(mail) {
+    const mails = queryCache.getQueryData<Mail[]>(['mails']) || []
+    const mailIndex = mails.findIndex(m => m.id === mail.id)
+    let newMails = mails
+    if (mailIndex >= 0) {
+      newMails = mails.toSpliced(mailIndex, 1, {
+        ...mail,
+        labels: mail.labels.includes('STARRED') ? [] : ['ARCHIVED']
+      })
+      queryCache.setQueryData(['mails'], newMails)
+    }
+
+    queryCache.cancelQueries({ key: ['mails'], exact: true })
+
+    return { oldMails: mails, newMails }
+  },
+
+  onSettled() {
+    // always refetch the mails after a mutation
+    queryCache.invalidateQueries({ key: ['mails'], exact: true })
+  },
+
+  onError(err, mail, { oldMails, newMails }) {
+    // oldMails can be undefined if onMutate errors
+    if (newMails != null && newMails === queryCache.getQueryData(['mails'])) {
+      queryCache.setQueryData(['mails'], oldMails)
+    }
+
+    console.error(err)
+    toast.error('Unexpected Error')
+  }
+})
+
+const { mutate: trash } = useMutation({
+  mutation: (mail: Mail) =>
+    $trpc.mails.trash.mutate({
+      id: mail.id
+    }),
+
+  onMutate(mail) {
+    const mails = queryCache.getQueryData<Mail[]>(['mails']) || []
+    const mailIndex = mails.findIndex(m => m.id === mail.id)
+    let newMails = mails
+    if (mailIndex >= 0) {
+      newMails = mails.filter(m => m.id !== mail.id)
+      queryCache.setQueryData(['mails'], newMails)
+    }
+
+    queryCache.cancelQueries({ key: ['mails'], exact: true })
+
+    return { oldMails: mails, newMails }
+  },
+
+  onSettled() {
+    // always refetch the mails after a mutation
+    queryCache.invalidateQueries({ key: ['mails'], exact: true })
+  },
+
+  onError(err, mail, { oldMails, newMails }) {
+    // oldMails can be undefined if onMutate errors
+    if (newMails != null && newMails === queryCache.getQueryData(['mails'])) {
+      queryCache.setQueryData(['mails'], oldMails)
+    }
+
+    console.error(err)
+    toast.error('Unexpected Error')
+  }
+})
+
 // デバッグ用
 watchEffect(() => console.log(
-  mails.value
+  mails.value?.map(m => m.labels)
 ))
 </script>
 
@@ -98,6 +173,33 @@ watchEffect(() => console.log(
                 {{ mail.subject }}
               </span>
             </div>
+          </div>
+
+          <div>
+            <UiButton
+              variant="ghost"
+              size="icon"
+              class="h-8 w-8 p-0 hover:bg-transparent"
+              @click.stop="archive(mail)"
+            >
+              <Icon
+                class="text-muted-foreground"
+                name="material-symbols:archive-rounded"
+                size="1.5em"
+              />
+            </UiButton>
+            <UiButton
+              variant="ghost"
+              size="icon"
+              class="h-8 w-8 p-0 hover:bg-transparent"
+              @click.stop="trash(mail)"
+            >
+              <Icon
+                class="text-muted-foreground"
+                name="material-symbols:delete-rounded"
+                size="1.5em"
+              />
+            </UiButton>
           </div>
         </div>
       </div>
