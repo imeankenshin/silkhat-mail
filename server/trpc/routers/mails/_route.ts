@@ -7,7 +7,7 @@ import { toggleStarHandler } from './toggleStar.handler'
 import { VToggleStarInputSchema } from './toggleStar.schema'
 import { VArchiveMailInputSchema } from './archive.schema'
 import { archiveMailHandler } from './archive.handler'
-import { trashMailHandler } from './trash.hanlder'
+import { trashMailHandler } from './trash.handler'
 import { VTrashMailInputSchema } from './trash.schema'
 
 export const mailRoutes = createTRPCRouter({

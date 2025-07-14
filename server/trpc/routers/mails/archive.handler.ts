@@ -1,8 +1,8 @@
 import { TRPCError } from '@trpc/server'
-import type { User } from 'better-auth'
 import type { TArchiveMailInputSchema } from './archive.schema'
 import { TokenService } from '~~/server/services/auth/token.service'
 import { GmailService } from '~~/server/services/gmail/gmail.service'
+import type { User } from '~~/types/auth'
 
 type ArchiveMailOptions = {
   ctx: {
