@@ -35,7 +35,7 @@ export async function getHandler({ ctx, input }: GetMailsOptions) {
   const { data: messages, error } = await gmailService.getMessages(accessToken, {
     maxResults: input.maxResults || 10,
     pageToken: input.pageToken,
-    q: input.q
+    q: input.q || 'in:inbox'
   })
 
   if (error !== null) {

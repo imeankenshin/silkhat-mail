@@ -59,10 +59,7 @@ const { mutate: archive } = useMutation({
     const mailIndex = mails.findIndex(m => m.id === mail.id)
     let newMails = mails
     if (mailIndex >= 0) {
-      newMails = mails.toSpliced(mailIndex, 1, {
-        ...mail,
-        labels: mail.labels.includes('STARRED') ? [] : ['ARCHIVED']
-      })
+      newMails = mails.filter(m => m.id !== mail.id)
       queryCache.setQueryData(['mails'], newMails)
     }
 
