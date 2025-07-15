@@ -22,7 +22,9 @@ const { mutate: toggleStar } = useMutation({
     if (mailIndex >= 0) {
       newMails = mails.toSpliced(mailIndex, 1, {
         ...mail,
-        labels: mail.labels.includes('STARRED') ? [] : ['STARRED']
+        labels: mail.labels.includes('STARRED')
+          ? mail.labels.filter(label => label !== 'STARRED')
+          : [...mail.labels, 'STARRED']
       })
       queryCache.setQueryData(['mails'], newMails)
     }
