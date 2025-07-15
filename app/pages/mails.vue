@@ -119,11 +119,6 @@ const { mutate: trash } = useMutation({
     toast.error('Unexpected Error')
   }
 })
-
-// デバッグ用
-watchEffect(() => console.log(
-  mails.value?.map(m => m.labels)
-))
 </script>
 
 <template>
