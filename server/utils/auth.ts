@@ -16,7 +16,7 @@ export const serverAuth = () => {
         clientId: config.googleClientId!,
         clientSecret: config.googleClientSecret!,
         callbackUrl: config.googleRedirectUrl!,
-        scope: ['https://mail.google.com/']
+        scope: ['https://www.googleapis.com/auth/gmail.readonly']
       }
     }
   })
