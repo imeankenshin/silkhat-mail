@@ -32,7 +32,7 @@ export async function archiveMailHandler({ ctx, input }: ArchiveMailOptions) {
   }
 
   // Gmail APIを使用してメッセージを取得
-  const { data: messages, error } = await gmailService.archive(accessToken, input.id)
+  const { data: result, error } = await gmailService.archive(accessToken, input.id)
 
   if (error !== null) {
     throw new TRPCError({
@@ -41,5 +41,5 @@ export async function archiveMailHandler({ ctx, input }: ArchiveMailOptions) {
     })
   }
 
-  return messages
+  return result
 }
