@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "dev": "nuxi dev",
-    "build": "nuxi build",
+    "build": "NODE_OPTIONS=--max-old-space-size=8192 nuxi build",
     "preview": "npx nuxthub preview",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
