@@ -1,126 +1,41 @@
 <script setup lang="ts">
-import { toast } from 'vue-sonner'
-
 // サンプルメールデータ
 const { $trpc } = useNuxtApp()
 const { data: mails } = useQuery({
   key: ['mails'],
   query: () => $trpc.mails.get.query({})
 })
-const queryCache = useQueryCache()
 
-const { mutate: toggleStar } = useMutation({
-  mutation: (mail: Mail) =>
-    $trpc.mails.toggleStar.mutate({
-      id: mail.id
+const { mutate: toggleStar } = useMailMutation(
+  (mail: Mail) => $trpc.mails.toggleStar.mutate({ id: mail.id }),
+  (mails, mail, mailIndex) =>
+    mails.toSpliced(mailIndex, 1, {
+      ...mail,
+      labels: mail.labels.includes('STARRED')
+        ? mail.labels.filter(label => label !== 'STARRED')
+        : [...mail.labels, 'STARRED']
     }),
+  'Failed to toggle star'
+)
 
-  onMutate(mail) {
-    const mails = queryCache.getQueryData<Mail[]>(['mails']) || []
-    const mailIndex = mails.findIndex(m => m.id === mail.id)
-    let newMails = mails
-    if (mailIndex >= 0) {
-      newMails = mails.toSpliced(mailIndex, 1, {
-        ...mail,
-        labels: mail.labels.includes('STARRED')
-          ? mail.labels.filter(label => label !== 'STARRED')
-          : [...mail.labels, 'STARRED']
-      })
-      queryCache.setQueryData(['mails'], newMails)
-    }
-
-    queryCache.cancelQueries({ key: ['mails'], exact: true })
-
-    return { oldMails: mails, newMails }
-  },
-
-  onSettled() {
-    // always refetch the mails after a mutation
-    queryCache.invalidateQueries({ key: ['mails'], exact: true })
-  },
-
-  onError(err, mail, { oldMails, newMails }) {
-    // oldMails can be undefined if onMutate errors
-    if (newMails != null && newMails === queryCache.getQueryData(['mails'])) {
-      queryCache.setQueryData(['mails'], oldMails)
-    }
-
-    console.error(err)
-    toast.error('Unexpected Error')
-  }
-})
-
-const { mutate: archive } = useMutation({
-  mutation: (mail: Mail) =>
+const { mutate: archive } = useMailMutation(
+  (mail: Mail) =>
     $trpc.mails.archive.mutate({
       id: mail.id
     }),
+  (mails, mail) => mails.filter(m => m.id !== mail.id),
+  'Failed to archive mail'
 
-  onMutate(mail) {
-    const mails = queryCache.getQueryData<Mail[]>(['mails']) || []
-    const mailIndex = mails.findIndex(m => m.id === mail.id)
-    let newMails = mails
-    if (mailIndex >= 0) {
-      newMails = mails.filter(m => m.id !== mail.id)
-      queryCache.setQueryData(['mails'], newMails)
-    }
+)
 
-    queryCache.cancelQueries({ key: ['mails'], exact: true })
-
-    return { oldMails: mails, newMails }
-  },
-
-  onSettled() {
-    // always refetch the mails after a mutation
-    queryCache.invalidateQueries({ key: ['mails'], exact: true })
-  },
-
-  onError(err, mail, { oldMails, newMails }) {
-    // oldMails can be undefined if onMutate errors
-    if (newMails != null && newMails === queryCache.getQueryData(['mails'])) {
-      queryCache.setQueryData(['mails'], oldMails)
-    }
-
-    console.error(err)
-    toast.error('Unexpected Error')
-  }
-})
-
-const { mutate: trash } = useMutation({
-  mutation: (mail: Mail) =>
+const { mutate: trash } = useMailMutation(
+  (mail: Mail) =>
     $trpc.mails.trash.mutate({
       id: mail.id
     }),
-
-  onMutate(mail) {
-    const mails = queryCache.getQueryData<Mail[]>(['mails']) || []
-    const mailIndex = mails.findIndex(m => m.id === mail.id)
-    let newMails = mails
-    if (mailIndex >= 0) {
-      newMails = mails.filter(m => m.id !== mail.id)
-      queryCache.setQueryData(['mails'], newMails)
-    }
-
-    queryCache.cancelQueries({ key: ['mails'], exact: true })
-
-    return { oldMails: mails, newMails }
-  },
-
-  onSettled() {
-    // always refetch the mails after a mutation
-    queryCache.invalidateQueries({ key: ['mails'], exact: true })
-  },
-
-  onError(err, mail, { oldMails, newMails }) {
-    // oldMails can be undefined if onMutate errors
-    if (newMails != null && newMails === queryCache.getQueryData(['mails'])) {
-      queryCache.setQueryData(['mails'], oldMails)
-    }
-
-    console.error(err)
-    toast.error('Unexpected Error')
-  }
-})
+  (mails, mail) => mails.filter(m => m.id !== mail.id),
+  'Failed to trash mail'
+)
 </script>
 
 <template>
