@@ -41,7 +41,8 @@ export async function getHandler({ ctx, input }: GetMailsOptions) {
   if (error !== null) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
-      message: 'Failed to fetch emails'
+      message: 'Failed to fetch emails',
+      cause: error
     })
   }
 

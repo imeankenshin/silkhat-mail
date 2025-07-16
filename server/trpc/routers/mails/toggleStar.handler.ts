@@ -37,7 +37,8 @@ export async function toggleStarHandler({ ctx, input }: ToggleStarOptions) {
   if (error !== null) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
-      message: 'Failed to fetch emails'
+      message: 'Failed to fetch emails',
+      cause: error
     })
   }
 

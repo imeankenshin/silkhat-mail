@@ -37,7 +37,8 @@ export async function trashMailHandler({ ctx, input }: TrashMailOptions) {
   if (error !== null) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
-      message: 'Failed to fetch emails'
+      message: 'Failed to fetch emails',
+      cause: error
     })
   }
 

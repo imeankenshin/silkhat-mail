@@ -37,7 +37,8 @@ export async function archiveMailHandler({ ctx, input }: ArchiveMailOptions) {
   if (error !== null) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
-      message: 'Failed to fetch emails'
+      message: 'Failed to fetch emails',
+      cause: error
     })
   }
 
