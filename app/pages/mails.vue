@@ -9,12 +9,9 @@ const { data: mails } = useQuery({
 const { mutate: toggleStar } = useMailMutation(
   (mail: Mail) => $trpc.mails.toggleStar.mutate({ id: mail.id }),
   (mails, mail, mailIndex) =>
-    mails.toSpliced(mailIndex, 1, {
-      ...mail,
-      labels: mail.labels.includes('STARRED')
-        ? mail.labels.filter(label => label !== 'STARRED')
-        : [...mail.labels, 'STARRED']
-    }),
+    mails.toSpliced(mailIndex, 1,
+      toStarToggled(mail)
+    ),
   'Failed to toggle star'
 )
 
@@ -23,9 +20,8 @@ const { mutate: archive } = useMailMutation(
     $trpc.mails.archive.mutate({
       id: mail.id
     }),
-  (mails, mail) => mails.filter(m => m.id !== mail.id),
+  (mails, mail) => mails.filter(m => !isSameMail(m, mail)),
   'Failed to archive mail'
-
 )
 
 const { mutate: trash } = useMailMutation(
@@ -33,7 +29,7 @@ const { mutate: trash } = useMailMutation(
     $trpc.mails.trash.mutate({
       id: mail.id
     }),
-  (mails, mail) => mails.filter(m => m.id !== mail.id),
+  (mails, mail) => mails.filter(m => !isSameMail(m, mail)),
   'Failed to trash mail'
 )
 </script>

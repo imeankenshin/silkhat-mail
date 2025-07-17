@@ -10,7 +10,7 @@ export const useMailMutation = <TResult>(
     mutation: mutationFn,
     onMutate(mail) {
       const mails = queryCache.getQueryData<Mail[]>(['mails']) || []
-      const mailIndex = mails.findIndex(m => m.id === mail.id)
+      const mailIndex = mails.findIndex(m => isSameMail(m, mail))
       if (mailIndex >= 0) {
         const newMails = optimisticUpdate(mails, mail, mailIndex)
         queryCache.setQueryData(['mails'], newMails)
