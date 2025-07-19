@@ -30,7 +30,7 @@ jobs:
       - name: Run database migrations
         run: pnpm db:migrate
         env:
-          NUXT_DATABASE_URL: ${{ secrets.NUXT_DATABASE_URL }}
+          NUXT_DATABASE_URL: ${{ env.NUXT_DATABASE_URL }}
 
       - name: Ensure NuxtHub module is installed
         run: pnpx nuxthub@latest ensure
