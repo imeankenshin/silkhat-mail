@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useDebounceFn } from '@vueuse/core'
+
 // サンプルメールデータ
 const { $trpc } = useNuxtApp()
 const { data: mails } = useQuery({
@@ -6,8 +8,13 @@ const { data: mails } = useQuery({
   query: () => $trpc.mails.get.query({})
 })
 
+const debounceToggleStar = useDebounceFn(async (mail: Mail) => {
+  return $trpc.mails.toggleStar.mutate({ id: mail.id, value: !isStarred(mail) })
+},
+3000)
+
 const { mutate: toggleStar } = useMailMutation(
-  (mail: Mail) => $trpc.mails.toggleStar.mutate({ id: mail.id }),
+  debounceToggleStar,
   (mails, mail, mailIndex) =>
     mails.toSpliced(mailIndex, 1,
       toStarToggled(mail)
@@ -21,8 +28,7 @@ const { mutate: archive } = useMailMutation(
       id: mail.id
     }),
   (mails, mail) => mails.filter(m => !isSameMail(m, mail)),
-  'Failed to archive mail'
-)
+  'Failed to archive mail')
 
 const { mutate: trash } = useMailMutation(
   (mail: Mail) =>

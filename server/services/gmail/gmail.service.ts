@@ -48,29 +48,15 @@ export class GmailService implements IGmailService {
     return success(messages)
   }
 
-  async toggleStar(accessToken: string, messageId: string) {
+  async toggleStar(accessToken: string, messageId: string, isStarred: boolean) {
     const auth = new google.auth.OAuth2()
     auth.setCredentials({ access_token: accessToken })
 
     const gmail = google.gmail({ version: 'v1', auth })
 
-    const { data: message, error: getMessageError } = await tryCatch(
-      gmail.users.messages
-        .get({
-          userId: 'me',
-          id: messageId,
-          format: 'metadata',
-          metadataHeaders: ['Labels']
-        })
-        .then(res => res.data)
-    )
-    if (getMessageError !== null) {
-      return failure(getMessageError)
-    }
-
-    const requestBodyKey = message.labelIds?.includes('STARRED')
-      ? 'removeLabelIds'
-      : 'addLabelIds'
+    const requestBodyKey = isStarred
+      ? 'addLabelIds'
+      : 'removeLabelIds'
     const { error: toggleStarError } = await tryCatch(
       gmail.users.messages.modify({
         userId: 'me',

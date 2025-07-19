@@ -32,7 +32,7 @@ export async function toggleStarHandler({ ctx, input }: ToggleStarOptions) {
   }
 
   // Gmail APIを使用してメッセージを取得
-  const { data: messages, error } = await gmailService.toggleStar(accessToken, input.id)
+  const { data: messages, error } = await gmailService.toggleStar(accessToken, input.id, input.value)
 
   if (error !== null) {
     throw new TRPCError({
