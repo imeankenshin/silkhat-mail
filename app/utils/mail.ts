@@ -4,7 +4,9 @@ export const isStarred = (mail: Mail) => {
 
 export const toStarred = (mail: Mail): Mail => {
   const cloned = structuredClone(mail)
-  cloned.labels.push('STARRED')
+  if (!cloned.labels.includes('STARRED')) {
+    cloned.labels.push('STARRED')
+  }
   return cloned
 }
 
