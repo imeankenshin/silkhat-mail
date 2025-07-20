@@ -1,6 +1,6 @@
-import type { gmail_v1 } from 'googleapis'
-import { google } from 'googleapis'
 import type { IGmailService, GetMessagesOptions } from './gmail.interface'
+
+const GMAIL_API_BASE_URL = 'https://gmail.googleapis.com/gmail/v1'
 
 const formattableFromPatterns = [
   /^"([^"]+)" <([^>]+)>$/,
@@ -8,40 +8,71 @@ const formattableFromPatterns = [
 ] as const
 
 export class GmailService implements IGmailService {
+  /**
+   * Gmail APIと通信するための汎用fetchラッパー
+   */
+  async #fetchGmailApi<T>(
+    accessToken: string,
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    const response = await fetch(`${GMAIL_API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        ...options.headers,
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      // Google APIのエラー構造: { error: { code, message, errors, status } }
+      throw new Error(error.error?.message || 'Gmail API request failed')
+    }
+
+    // modifyやtrashのような空のレスポンスボディを処理
+    if (response.status === 204 || response.headers.get('Content-Length') === '0') {
+      return undefined as T
+    }
+
+    return response.json()
+  }
+
   async getMessages(accessToken: string, options: GetMessagesOptions = {}) {
-    const auth = new google.auth.OAuth2()
-    auth.setCredentials({ access_token: accessToken })
+    const queryParams = new URLSearchParams()
+    queryParams.append('maxResults', (options.maxResults || 10).toString())
+    if (options.pageToken) {
+      queryParams.append('pageToken', options.pageToken)
+    }
+    if (options.q) {
+      queryParams.append('q', options.q)
+    }
 
-    const gmail = google.gmail({ version: 'v1', auth })
-
-    // メッセージIDのリストを取得
     const { data: listResponse, error } = await tryCatch(
-      gmail.users.messages.list({
-        userId: 'me',
-        maxResults: options.maxResults || 10,
-        pageToken: options.pageToken,
-        q: options.q
-      })
+      this.#fetchGmailApi<ListMessagesResponse>(
+        accessToken,
+        `/users/me/messages?${queryParams.toString()}`
+      )
     )
+
     if (error !== null) {
       return failure(error)
     }
 
-    if (!listResponse.data.messages) {
+    if (!listResponse?.messages) {
       return success([])
     }
 
-    // 各メッセージの詳細を取得
-    const messages = await Promise.all(
-      listResponse.data.messages.map(async (message) => {
-        const messageResponse = await gmail.users.messages.get({
-          userId: 'me',
-          id: message.id!,
-          format: 'metadata',
-          metadataHeaders: ['From', 'To', 'Subject', 'Date']
-        })
+    const metadataHeaders = ['From', 'To', 'Subject', 'Date']
 
-        return this.#formatMessage(messageResponse.data)
+    const messages = await Promise.all(
+      listResponse.messages.map(async (message) => {
+        const messageResponse = await this.#fetchGmailApi<GmailMessage>(
+          accessToken,
+          `/users/me/messages/${message.id!}?${metadataHeaders.map(h => `metadataHeaders=${h}`).join('&')}`
+        )
+        return this.#formatMessage(messageResponse)
       })
     )
 
@@ -49,23 +80,16 @@ export class GmailService implements IGmailService {
   }
 
   async toggleStar(accessToken: string, messageId: string, isStarred: boolean) {
-    const auth = new google.auth.OAuth2()
-    auth.setCredentials({ access_token: accessToken })
-
-    const gmail = google.gmail({ version: 'v1', auth })
-
-    const requestBodyKey = isStarred
-      ? 'addLabelIds'
-      : 'removeLabelIds'
+    const requestBodyKey = isStarred ? 'addLabelIds' : 'removeLabelIds'
     const { error: toggleStarError } = await tryCatch(
-      gmail.users.messages.modify({
-        userId: 'me',
-        id: messageId,
-        requestBody: {
+      this.#fetchGmailApi(accessToken, `/users/me/messages/${messageId}/modify`, {
+        method: 'POST',
+        body: JSON.stringify({
           [requestBodyKey]: ['STARRED']
-        }
+        })
       })
     )
+
     if (toggleStarError !== null) {
       return failure(toggleStarError)
     }
@@ -74,20 +98,15 @@ export class GmailService implements IGmailService {
   }
 
   async archive(accessToken: string, messageId: string) {
-    const auth = new google.auth.OAuth2()
-    auth.setCredentials({ access_token: accessToken })
-
-    const gmail = google.gmail({ version: 'v1', auth })
-
     const { error: archiveError } = await tryCatch(
-      gmail.users.messages.modify({
-        userId: 'me',
-        id: messageId,
-        requestBody: {
+      this.#fetchGmailApi(accessToken, `/users/me/messages/${messageId}/modify`, {
+        method: 'POST',
+        body: JSON.stringify({
           removeLabelIds: ['INBOX']
-        }
+        })
       })
     )
+
     if (archiveError !== null) {
       return failure(archiveError)
     }
@@ -96,17 +115,12 @@ export class GmailService implements IGmailService {
   }
 
   async trash(accessToken: string, messageId: string) {
-    const auth = new google.auth.OAuth2()
-    auth.setCredentials({ access_token: accessToken })
-
-    const gmail = google.gmail({ version: 'v1', auth })
-
     const { error: trashError } = await tryCatch(
-      gmail.users.messages.trash({
-        userId: 'me',
-        id: messageId
+      this.#fetchGmailApi(accessToken, `/users/me/messages/${messageId}/trash`, {
+        method: 'POST'
       })
     )
+
     if (trashError !== null) {
       return failure(trashError)
     }
@@ -114,17 +128,8 @@ export class GmailService implements IGmailService {
     return success(undefined)
   }
 
-  #formatMessage(messageData: gmail_v1.Schema$Message): Mail {
-    const headers
-      = messageData.payload?.headers
-        ?.filter(
-          (header): header is { name: string, value: string } =>
-            header.name != null && header.value != null
-        )
-        .map(header => ({
-          name: header.name,
-          value: header.value
-        })) || []
+  #formatMessage(messageData: GmailMessage): Mail {
+    const headers = messageData.payload?.headers || []
 
     const from = this.#formatFrom(
       headers.find(h => h.name === 'From')?.value || null
@@ -145,15 +150,6 @@ export class GmailService implements IGmailService {
     }
   }
 
-  /**
-   * @example
-   * formatFrom('Kenshin Omura <kenshin.omura@gmail.com>')
-   * // => { name: 'Kenshin Omura', email: 'kenshin.omura@gmail.com' }
-   * formatFrom('kenshin.omura@gmail.com')
-   * // => 'kenshin.omura@gmail.com'
-   * formatFrom('"Kenshin Omura" <kenshin.omura@gmail.com>')
-   * // => { name: 'Kenshin Omura', email: 'kenshin.omura@gmail.com' }
-   */
   #formatFrom(from: string | null) {
     if (!from) return null
     for (const pattern of formattableFromPatterns) {

@@ -52,24 +52,33 @@ export class TokenService implements ITokenService {
       return success(null)
     }
 
-    const google = useGoogleOAuth()
-    google.setCredentials({ refresh_token: account.refreshToken })
+    const config = useRuntimeConfig()
 
-    const { data: response, error: refreshAccessTokenError } = await tryCatch(
-      google.refreshAccessToken()
+    const body = new URLSearchParams({
+      client_id: config.googleClientId,
+      client_secret: config.googleClientSecret,
+      refresh_token: account.refreshToken,
+      grant_type: 'refresh_token'
+    })
+
+    const { data: response, error: refreshError } = await tryCatch(
+      $fetch<GoogleTokenResponse>('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body
+      })
     )
-    if (refreshAccessTokenError !== null) {
+
+    if (refreshError !== null) {
       return failure(new Error('Failed to refresh token.', {
-        cause: refreshAccessTokenError
+        cause: refreshError
       }))
     }
 
-    const data = response?.res?.data
-    if (!data) {
-      return failure(new Error('Failed to refresh token: response data is missing.'))
-    }
-    const newAccessToken = data.access_token
-    const expiresIn = data.expires_in || 3600
+    const newAccessToken = response.access_token
+    const expiresIn = response.expires_in || 3600
     const expiresAt = new Date(Date.now() + expiresIn * 1000)
 
     // データベースのアクセストークンを更新
