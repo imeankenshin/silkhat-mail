@@ -68,14 +68,15 @@ export class GmailService implements IGmailService {
 
     const messages = await Promise.all(
       listResponse.messages.map(async (message) => {
+        const params = new URLSearchParams()
+        metadataHeaders.forEach(h => params.append('metadataHeaders', h))
         const messageResponse = await this.#fetchGmailApi<GmailMessage>(
           accessToken,
-          `/users/me/messages/${message.id!}?${metadataHeaders.map(h => `metadataHeaders=${h}`).join('&')}`
+          `/users/me/messages/${message.id!}?${params.toString()}`
         )
         return this.#formatMessage(messageResponse)
       })
     )
-
     return success(messages)
   }
 
