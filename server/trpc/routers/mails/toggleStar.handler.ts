@@ -1,21 +1,19 @@
 import { TRPCError } from '@trpc/server'
+import { useUser } from '../../context/user-context'
 import type { TToggleStarInputSchema } from './toggleStar.schema'
 import { TokenService } from '~~/server/services/auth/token.service'
 import { GmailService } from '~~/server/services/gmail/gmail.service'
-import type { User } from '~~/types/auth'
 
 type ToggleStarOptions = {
-  ctx: {
-    user: User
-  }
   input: TToggleStarInputSchema
 }
 
-export async function toggleStarHandler({ ctx, input }: ToggleStarOptions) {
+export async function toggleStarHandler({ input }: ToggleStarOptions) {
+  const { user } = useUser()
   const gmailService = new GmailService()
   const tokenService = new TokenService()
   // ユーザーのGoogleアクセストークンを取得
-  const { data: accessToken, error: accessTokenError } = await tokenService.getGoogleAccessToken(ctx.user.id)
+  const { data: accessToken, error: accessTokenError } = await tokenService.getGoogleAccessToken(user.id)
 
   if (accessTokenError !== null) {
     throw new TRPCError({

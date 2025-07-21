@@ -1,21 +1,19 @@
 import { TRPCError } from '@trpc/server'
+import { useUser } from '../../context/user-context'
 import type { TArchiveMailInputSchema } from './archive.schema'
 import { TokenService } from '~~/server/services/auth/token.service'
 import { GmailService } from '~~/server/services/gmail/gmail.service'
-import type { User } from '~~/types/auth'
 
 type ArchiveMailOptions = {
-  ctx: {
-    user: User
-  }
   input: TArchiveMailInputSchema
 }
 
-export async function archiveMailHandler({ ctx, input }: ArchiveMailOptions) {
+export async function archiveMailHandler({ input }: ArchiveMailOptions) {
+  const { user } = useUser()
   const gmailService = new GmailService()
   const tokenService = new TokenService()
   // ユーザーのGoogleアクセストークンを取得
-  const { data: accessToken, error: accessTokenError } = await tokenService.getGoogleAccessToken(ctx.user.id)
+  const { data: accessToken, error: accessTokenError } = await tokenService.getGoogleAccessToken(user.id)
 
   if (accessTokenError !== null) {
     throw new TRPCError({

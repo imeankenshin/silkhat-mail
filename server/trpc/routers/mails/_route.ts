@@ -11,16 +11,16 @@ import { trashMailHandler } from './trash.handler'
 import { VTrashMailInputSchema } from './trash.schema'
 
 export const mailRoutes = createTRPCRouter({
-  get: authedProcedure.input(v => parse(VGetMailsInputSchema, v)).query(({ ctx, input }) =>
-    getHandler({ ctx, input })
-  ),
-  toggleStar: authedProcedure.input(v => parse(VToggleStarInputSchema, v)).mutation(({ ctx, input }) =>
-    toggleStarHandler({ ctx, input })
-  ),
-  archive: authedProcedure.input(v => parse(VArchiveMailInputSchema, v)).mutation(({ ctx, input }) =>
-    archiveMailHandler({ ctx, input })
-  ),
-  trash: authedProcedure.input(v => parse(VTrashMailInputSchema, v)).mutation(({ ctx, input }) =>
-    trashMailHandler({ ctx, input })
-  )
+  get: authedProcedure
+    .input(v => parse(VGetMailsInputSchema, v))
+    .query(async ({ input }) => getHandler({ input })),
+  toggleStar: authedProcedure
+    .input(v => parse(VToggleStarInputSchema, v))
+    .mutation(({ input }) => toggleStarHandler({ input })),
+  archive: authedProcedure
+    .input(v => parse(VArchiveMailInputSchema, v))
+    .mutation(({ input }) => archiveMailHandler({ input })),
+  trash: authedProcedure
+    .input(v => parse(VTrashMailInputSchema, v))
+    .mutation(({ input }) => trashMailHandler({ input }))
 })
