@@ -1,6 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import { baseProcedure } from '../init'
-import { provideUser } from '../context/user-context'
+import { provideSession } from '../context/session'
 
 export const authedProcedure = baseProcedure.use(async ({ next }) => {
   const auth = serverAuth()
@@ -9,6 +9,5 @@ export const authedProcedure = baseProcedure.use(async ({ next }) => {
   if (!session) {
     throw new TRPCError({ code: 'UNAUTHORIZED' })
   }
-  const result = await provideUser(session, next)
-  return result
+  return provideSession(session, next)
 })

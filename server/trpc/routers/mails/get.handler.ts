@@ -1,6 +1,6 @@
 import { TRPCError } from '@trpc/server'
-import { useUser } from '../../context/user-context'
 import type { TGetMailsInputSchema } from './get.schema'
+import { useSession } from '~~/server/trpc/context/session'
 import { GmailService } from '~~/server/services/gmail/gmail.service'
 import { TokenService } from '~~/server/services/auth/token.service'
 
@@ -9,7 +9,7 @@ type GetMailsOptions = {
 }
 
 export async function getHandler({ input }: GetMailsOptions) {
-  const { user } = useUser()
+  const { user } = useSession()
   const gmailService = new GmailService()
   const tokenService = new TokenService()
   // ユーザーのGoogleアクセストークンを取得

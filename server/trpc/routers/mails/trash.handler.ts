@@ -1,6 +1,6 @@
 import { TRPCError } from '@trpc/server'
-import { useUser } from '../../context/user-context'
 import type { TTrashMailInputSchema } from './trash.schema'
+import { useSession } from '~~/server/trpc/context/session'
 import { TokenService } from '~~/server/services/auth/token.service'
 import { GmailService } from '~~/server/services/gmail/gmail.service'
 
@@ -9,7 +9,7 @@ type TrashMailOptions = {
 }
 
 export async function trashMailHandler({ input }: TrashMailOptions) {
-  const { user } = useUser()
+  const { user } = useSession()
   const gmailService = new GmailService()
   const tokenService = new TokenService()
   // ユーザーのGoogleアクセストークンを取得
