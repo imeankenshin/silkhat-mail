@@ -9,8 +9,13 @@ import { VArchiveMailInputSchema } from './archive.schema'
 import { archiveMailHandler } from './archive.handler'
 import { trashMailHandler } from './trash.handler'
 import { VTrashMailInputSchema } from './trash.schema'
+import { getHandler } from './get.handler'
+import { VGetMailsInputSchema } from './get.schema'
 
 export const mailRoutes = createTRPCRouter({
+  get: authedProcedure
+    .input(v => parse(VGetMailsInputSchema, v))
+    .query(async ({ input }) => getHandler({ input })),
   list: authedProcedure
     .input(v => parse(VListMailsInputSchema, v))
     .query(async ({ input }) => listHandler({ input })),

@@ -42,6 +42,7 @@ export class GmailService implements IGmailService {
   async getMessage(accessToken: string, id: string) {
     const metadataHeaders = ['From', 'To', 'Subject', 'Date']
     const params = new URLSearchParams()
+    params.append('format', 'full')
     metadataHeaders.forEach(h => params.append('metadataHeaders', h))
     const { data: result, error } = await tryCatch(this.#fetchGmailApi<GmailMessage>(
       accessToken,
@@ -50,7 +51,7 @@ export class GmailService implements IGmailService {
     if (error !== null) {
       return failure(error)
     }
-    return success(this.#formatMessage(result))
+    return success(this.#formatFullMessage(result))
   }
 
   async listMessages(accessToken: string, options: GetMessagesOptions = {}) {
@@ -162,6 +163,34 @@ export class GmailService implements IGmailService {
       subject,
       date,
       labels: messageData.labelIds || []
+    }
+  }
+
+  #formatFullMessage(message: GmailMessage): FullMail {
+    let content = ''
+    if (message?.payload?.parts) {
+    // HTMLとプレーンテキストの両方を探す
+      const parts = message.payload.parts.filter(
+        part => part.mimeType === 'text/html' || part.mimeType === 'text/plain'
+      )
+
+      // パートをMIMEタイプでソート（HTMLを優先）
+      parts.sort((a, b) => {
+        if (a.mimeType === 'text/html') return -1
+        if (b.mimeType === 'text/html') return 1
+        return 0
+      })
+
+      if (parts.length > 0 && parts[0].body?.data) {
+        content = Buffer.from(parts[0].body.data, 'base64').toString()
+      }
+    }
+    if (message?.payload?.body?.data) {
+      content = Buffer.from(message.payload.body.data, 'base64').toString()
+    }
+    return {
+      ...this.#formatMessage(message),
+      content
     }
   }
 
