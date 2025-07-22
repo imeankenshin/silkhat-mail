@@ -22,8 +22,9 @@ const mailContent = computedAsync(async () => {
   if (!mail.value?.isHTML)
     return mail.value?.content ?? ''
   const document = new DOMParser().parseFromString(mail.value.content, 'text/html')
+  const style = Array.from(document.querySelectorAll('style')).map(s => s.innerText).join()
   document.querySelectorAll('a').forEach(a => a.target = '_blank')
-  return document.body.innerHTML ?? ''
+  return `${style && `<style>${style}</style>`}${document.body.innerHTML}`
 })
 
 const debounceToggleStar = useDebounceFn(async (mail: Mail) => {
@@ -81,9 +82,7 @@ watchEffect(() => {
               class="h-7"
             />
             <template v-else>
-              <h2
-                class="text-xl font-bold text-foreground"
-              >
+              <h2 class="text-xl font-bold text-foreground">
                 {{ mail.subject }}
               </h2>
               <p class="text-muted-foreground">
