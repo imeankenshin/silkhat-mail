@@ -12,4 +12,5 @@ export type Mail = {
 
 export type FullMail = Mail & {
   content: string
+  isHTML: boolean
 }

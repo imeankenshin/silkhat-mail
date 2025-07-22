@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useDebounceFn } from '@vueuse/core'
+import { computedAsync, useDebounceFn } from '@vueuse/core'
 
 // サンプルメールデータ
 const { $trpc, $router } = useNuxtApp()
@@ -15,6 +15,15 @@ const { data: mail } = useQuery({
 const { data: mails } = useQuery({
   key: ['mails'],
   query: () => $trpc.mails.list.query({})
+})
+
+const mailContent = computedAsync(async () => {
+  if (!mail.value) return null
+  if (!mail.value?.isHTML)
+    return mail.value?.content ?? ''
+  const document = new DOMParser().parseFromString(mail.value.content, 'text/html')
+  document.querySelectorAll('a').forEach(a => a.target = '_blank')
+  return document.body.innerHTML ?? ''
 })
 
 const debounceToggleStar = useDebounceFn(async (mail: Mail) => {
@@ -64,7 +73,7 @@ watchEffect(() => {
       :open="!!selectedMailId"
       @update:open="selectedMailId = undefined"
     >
-      <UiSheetContent class="max-w-3xl w-full">
+      <UiSheetContent class="sm:max-w-[600px]">
         <UiSheetHeader>
           <UiSkeleton
             v-if="!mail"
@@ -77,9 +86,12 @@ watchEffect(() => {
             {{ mail.subject }}
           </h2>
         </UiSheetHeader>
-        <div v-if="mail">
-          {{ mail.content }}
-        </div>
+        <UiShadowRoot
+          v-if="mailContent"
+          class="h-full overflow-auto"
+        >
+          <div v-html="mailContent" />
+        </UiShadowRoot>
         <UiSkeleton v-else />
       </UiSheetContent>
       <div
