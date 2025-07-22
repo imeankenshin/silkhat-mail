@@ -1,4 +1,5 @@
 import tailwindcss from '@tailwindcss/vite'
+import { unctxPlugin } from 'unctx/plugin'
 
 export default defineNuxtConfig({
   modules: [
@@ -47,7 +48,7 @@ export default defineNuxtConfig({
     }
   },
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss(), unctxPlugin.vite({})]
   },
   // Development config
   eslint: {

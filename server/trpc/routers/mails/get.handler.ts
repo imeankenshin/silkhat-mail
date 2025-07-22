@@ -1,21 +1,19 @@
 import { TRPCError } from '@trpc/server'
 import type { TGetMailsInputSchema } from './get.schema'
-import type { User } from '~~/types/auth'
+import { useSession } from '~~/server/trpc/context/session'
 import { GmailService } from '~~/server/services/gmail/gmail.service'
 import { TokenService } from '~~/server/services/auth/token.service'
 
 type GetMailsOptions = {
-  ctx: {
-    user: User
-  }
   input: TGetMailsInputSchema
 }
 
-export async function getHandler({ ctx, input }: GetMailsOptions) {
+export async function getHandler({ input }: GetMailsOptions) {
+  const { user } = useSession()
   const gmailService = new GmailService()
   const tokenService = new TokenService()
   // ユーザーのGoogleアクセストークンを取得
-  const { data: accessToken, error: accessTokenError } = await tokenService.getGoogleAccessToken(ctx.user.id)
+  const { data: accessToken, error: accessTokenError } = await tokenService.getGoogleAccessToken(user.id)
 
   if (accessTokenError !== null) {
     throw new TRPCError({
