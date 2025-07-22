@@ -1,8 +1,8 @@
 import { parse } from 'valibot'
 import { createTRPCRouter } from '../../init'
 import { authedProcedure } from '../../procedures/authed-procedure'
-import { getHandler } from './get.handler'
-import { VGetMailsInputSchema } from './get.schema'
+import { listHandler } from './list.handler'
+import { VListMailsInputSchema } from './list.schema'
 import { toggleStarHandler } from './toggleStar.handler'
 import { VToggleStarInputSchema } from './toggleStar.schema'
 import { VArchiveMailInputSchema } from './archive.schema'
@@ -11,9 +11,9 @@ import { trashMailHandler } from './trash.handler'
 import { VTrashMailInputSchema } from './trash.schema'
 
 export const mailRoutes = createTRPCRouter({
-  get: authedProcedure
-    .input(v => parse(VGetMailsInputSchema, v))
-    .query(async ({ input }) => getHandler({ input })),
+  list: authedProcedure
+    .input(v => parse(VListMailsInputSchema, v))
+    .query(async ({ input }) => listHandler({ input })),
   toggleStar: authedProcedure
     .input(v => parse(VToggleStarInputSchema, v))
     .mutation(({ input }) => toggleStarHandler({ input })),

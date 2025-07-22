@@ -5,7 +5,7 @@ import { useDebounceFn } from '@vueuse/core'
 const { $trpc } = useNuxtApp()
 const { data: mails } = useQuery({
   key: ['mails'],
-  query: () => $trpc.mails.get.query({})
+  query: () => $trpc.mails.list.query({})
 })
 
 const debounceToggleStar = useDebounceFn(async (mail: Mail) => {
