@@ -39,7 +39,21 @@ export class GmailService implements IGmailService {
     return response.json()
   }
 
-  async getMessages(accessToken: string, options: GetMessagesOptions = {}) {
+  async getMessage(accessToken: string, id: string) {
+    const metadataHeaders = ['From', 'To', 'Subject', 'Date']
+    const params = new URLSearchParams()
+    metadataHeaders.forEach(h => params.append('metadataHeaders', h))
+    const { data: result, error } = await tryCatch(this.#fetchGmailApi<GmailMessage>(
+      accessToken,
+      `/users/me/messages/${id!}?${params.toString()}`
+    ))
+    if (error !== null) {
+      return failure(error)
+    }
+    return success(this.#formatMessage(result))
+  }
+
+  async listMessages(accessToken: string, options: GetMessagesOptions = {}) {
     const queryParams = new URLSearchParams()
     queryParams.append('maxResults', (options.maxResults || 10).toString())
     if (options.pageToken) {
