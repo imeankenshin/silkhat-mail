@@ -74,25 +74,34 @@ watchEffect(() => {
       @update:open="selectedMailId = undefined"
     >
       <UiSheetContent class="sm:max-w-[600px]">
-        <UiSheetHeader>
-          <UiSkeleton
-            v-if="!mail"
-            class="h-7"
-          />
-          <h2
-            v-else
-            class="text-xl font-bold text-foreground"
+        <div class="h-full overflow-y-auto">
+          <UiSheetHeader class="pt-12">
+            <UiSkeleton
+              v-if="!mail"
+              class="h-7"
+            />
+            <template v-else>
+              <h2
+                class="text-xl font-bold text-foreground"
+              >
+                {{ mail.subject }}
+              </h2>
+              <p class="text-muted-foreground">
+                To: {{ mail.to }}
+              </p>
+              <p class="text-muted-foreground">
+                From: {{ mail.from }}
+              </p>
+            </template>
+          </UiSheetHeader>
+          <UiShadowRoot
+            v-if="mailContent"
+            class="h-max-content"
           >
-            {{ mail.subject }}
-          </h2>
-        </UiSheetHeader>
-        <UiShadowRoot
-          v-if="mailContent"
-          class="h-full overflow-auto"
-        >
-          <div v-html="mailContent" />
-        </UiShadowRoot>
-        <UiSkeleton v-else />
+            <div v-html="mailContent" />
+          </UiShadowRoot>
+          <UiSkeleton v-else />
+        </div>
       </UiSheetContent>
       <div
         v-if="mails"
