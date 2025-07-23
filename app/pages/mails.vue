@@ -78,21 +78,23 @@ watchEffect(() => {
       <UiSheetContent class="sm:max-w-2xl">
         <div class="h-full overflow-y-auto">
           <UiSheetHeader class="pt-12">
-            <UiSkeleton
-              v-if="!mail"
-              class="h-7"
-            />
-            <template v-else>
+            <template v-if="mail">
               <h2 class="text-xl font-bold text-foreground">
                 {{ mail.subject }}
               </h2>
-              <p class="text-muted-foreground">
-                To: {{ mail.to }}
-              </p>
-              <p class="text-muted-foreground">
-                From: {{ mail.from }}
-              </p>
+              <div>
+                <p class="text-muted-foreground">
+                  To: {{ mail.to }}
+                </p>
+                <p class="text-muted-foreground">
+                  From: {{ mail.from }}
+                </p>
+              </div>
             </template>
+            <UiSkeleton
+              v-else
+              class="h-7"
+            />
           </UiSheetHeader>
           <UiShadowRoot
             v-if="mailContent"
