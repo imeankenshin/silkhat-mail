@@ -32,14 +32,34 @@ export class GmailService implements IGmailService {
     }
 
     // modifyやtrashのような空のレスポンスボディを処理
-    if (response.status === 204 || response.headers.get('Content-Length') === '0') {
+    if (
+      response.status === 204
+      || response.headers.get('Content-Length') === '0'
+    ) {
       return undefined as T
     }
 
     return response.json()
   }
 
-  async getMessages(accessToken: string, options: GetMessagesOptions = {}) {
+  async getMessage(accessToken: string, id: string) {
+    const metadataHeaders = ['From', 'To', 'Subject', 'Date']
+    const params = new URLSearchParams()
+    params.append('format', 'full')
+    metadataHeaders.forEach(h => params.append('metadataHeaders', h))
+    const { data: result, error } = await tryCatch(
+      this.#fetchGmailApi<GmailMessage>(
+        accessToken,
+        `/users/me/messages/${id!}?${params.toString()}`
+      )
+    )
+    if (error !== null) {
+      return failure(error)
+    }
+    return success(this.#formatFullMessage(result))
+  }
+
+  async listMessages(accessToken: string, options: GetMessagesOptions = {}) {
     const queryParams = new URLSearchParams()
     queryParams.append('maxResults', (options.maxResults || 10).toString())
     if (options.pageToken) {
@@ -83,12 +103,16 @@ export class GmailService implements IGmailService {
   async toggleStar(accessToken: string, messageId: string, isStarred: boolean) {
     const requestBodyKey = isStarred ? 'addLabelIds' : 'removeLabelIds'
     const { error: toggleStarError } = await tryCatch(
-      this.#fetchGmailApi(accessToken, `/users/me/messages/${messageId}/modify`, {
-        method: 'POST',
-        body: JSON.stringify({
-          [requestBodyKey]: ['STARRED']
-        })
-      })
+      this.#fetchGmailApi(
+        accessToken,
+        `/users/me/messages/${messageId}/modify`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            [requestBodyKey]: ['STARRED']
+          })
+        }
+      )
     )
 
     if (toggleStarError !== null) {
@@ -100,12 +124,16 @@ export class GmailService implements IGmailService {
 
   async archive(accessToken: string, messageId: string) {
     const { error: archiveError } = await tryCatch(
-      this.#fetchGmailApi(accessToken, `/users/me/messages/${messageId}/modify`, {
-        method: 'POST',
-        body: JSON.stringify({
-          removeLabelIds: ['INBOX']
-        })
-      })
+      this.#fetchGmailApi(
+        accessToken,
+        `/users/me/messages/${messageId}/modify`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            removeLabelIds: ['INBOX']
+          })
+        }
+      )
     )
 
     if (archiveError !== null) {
@@ -117,9 +145,13 @@ export class GmailService implements IGmailService {
 
   async trash(accessToken: string, messageId: string) {
     const { error: trashError } = await tryCatch(
-      this.#fetchGmailApi(accessToken, `/users/me/messages/${messageId}/trash`, {
-        method: 'POST'
-      })
+      this.#fetchGmailApi(
+        accessToken,
+        `/users/me/messages/${messageId}/trash`,
+        {
+          method: 'POST'
+        }
+      )
     )
 
     if (trashError !== null) {
@@ -148,6 +180,38 @@ export class GmailService implements IGmailService {
       subject,
       date,
       labels: messageData.labelIds || []
+    }
+  }
+
+  #getContent(message: GmailMessage) {
+    if (message?.payload?.parts) {
+      // HTMLとプレーンテキストの両方を探す
+      const parts = message.payload.parts.filter(
+        part =>
+          part.mimeType === 'text/html' || part.mimeType === 'text/plain'
+      )
+
+      const htmlPart = parts.find(p => p.mimeType === 'text/html')
+      const plainPart = parts.find(p => p.mimeType === 'text/plain')
+
+      if (htmlPart) {
+        return { content: Buffer.from(htmlPart.body.data, 'base64').toString(), isHTML: true }
+      }
+
+      if (plainPart) {
+        return { content: Buffer.from(plainPart.body.data, 'base64').toString(), isHTML: false }
+      }
+    }
+    if (message?.payload?.body?.data) {
+      return { content: Buffer.from(message.payload.body.data, 'base64').toString(), isHTML: false }
+    }
+    return { content: '', isHTML: false }
+  }
+
+  #formatFullMessage(message: GmailMessage): FullMail {
+    return {
+      ...this.#formatMessage(message),
+      ...this.#getContent(message)
     }
   }
 

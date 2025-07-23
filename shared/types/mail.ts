@@ -9,3 +9,8 @@ export type Mail = {
   sizeEstimate: number
   labels: string[]
 }
+
+export type FullMail = Mail & {
+  content: string
+  isHTML: boolean
+}

@@ -51,14 +51,17 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
     >
       <slot />
 
-      <DialogClose
-        class="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none"
-      >
-        <Icon
-          name="i-lucide-x"
-          class="size-4"
-        />
-        <span class="sr-only">Close</span>
+      <DialogClose as-child>
+        <UiButton
+          size="icon"
+          variant="ghost"
+          class="absolute top-4 right-4 size-7"
+        >
+          <Icon
+            name="material-symbols:close-rounded"
+          />
+          <span class="sr-only">Close</span>
+        </UiButton>
       </DialogClose>
     </DialogContent>
   </DialogPortal>
