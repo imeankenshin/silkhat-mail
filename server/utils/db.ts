@@ -13,5 +13,3 @@ export function useDB() {
   })
   return drizzle({ client, schema })
 }
-
-export type Todo = typeof tables.todos.$inferSelect
