@@ -8,16 +8,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <Teleport
-      v-if="shadowRoot"
-      :to="shadowRoot"
-    >
-      <slot />
-    </Teleport>
-    <div
-      v-bind="$attrs"
-      ref="el"
-    />
-  </div>
+  <Teleport
+    v-if="shadowRoot"
+    :to="shadowRoot"
+  >
+    <slot />
+  </Teleport>
+  <div
+    v-bind="$attrs"
+    ref="el"
+  />
 </template>

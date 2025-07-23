@@ -75,7 +75,7 @@ watchEffect(() => {
       :open="!!selectedMailId"
       @update:open="selectedMailId = undefined"
     >
-      <UiSheetContent class="sm:max-w-[600px]">
+      <UiSheetContent class="sm:max-w-2xl">
         <div class="h-full overflow-y-auto">
           <UiSheetHeader class="pt-12">
             <UiSkeleton
@@ -96,9 +96,12 @@ watchEffect(() => {
           </UiSheetHeader>
           <UiShadowRoot
             v-if="mailContent"
-            class="h-max-content"
+            class="h-max overflow-auto px-4"
           >
-            <div v-html="mailContent" />
+            <div
+              class="contents"
+              v-html="mailContent"
+            />
           </UiShadowRoot>
           <UiSkeleton v-else />
         </div>
