@@ -5,10 +5,11 @@ import { useDB } from './db'
 export const serverAuth = () => {
   const config = useRuntimeConfig(useEvent())
   return betterAuth({
-    database: drizzleAdapter(useDB(), {
-      provider: 'pg',
-      debugLogs: true
-    }),
+    get database() {
+      return drizzleAdapter(useDB(), {
+        provider: 'pg'
+      })
+    },
     socialProviders: {
       google: {
         prompt: 'consent',
