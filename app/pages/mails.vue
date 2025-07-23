@@ -23,6 +23,7 @@ const mailContent = computed(() => {
     return mail.value?.content ?? ''
   const document = new DOMParser().parseFromString(mail.value.content, 'text/html')
   const style = Array.from(document.querySelectorAll('style')).map(s => s.innerText).join().replaceAll(/body|html/g, ':host')
+  document.querySelectorAll('script').forEach(s => s.remove())
   document.querySelectorAll('a').forEach(a => a.target = '_blank')
   return `${style && `<style>${style}</style>`}${document.body.innerHTML}`
 })
