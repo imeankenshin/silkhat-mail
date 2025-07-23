@@ -2,13 +2,19 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { useDB } from './db'
 
+let _databaseAdapter: ReturnType<typeof drizzleAdapter> | null = null
+
 export const serverAuth = () => {
   const config = useRuntimeConfig(useEvent())
   return betterAuth({
+
     get database() {
-      return drizzleAdapter(useDB(), {
-        provider: 'pg'
-      })
+      if (!_databaseAdapter) {
+        _databaseAdapter = drizzleAdapter(useDB(), {
+          provider: 'pg'
+        })
+      }
+      return _databaseAdapter
     },
     socialProviders: {
       google: {
