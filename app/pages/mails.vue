@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computedAsync, useDebounceFn } from '@vueuse/core'
+import { useDebounceFn } from '@vueuse/core'
 
 // サンプルメールデータ
 const { $trpc, $router } = useNuxtApp()
@@ -17,7 +17,7 @@ const { data: mails } = useQuery({
   query: () => $trpc.mails.list.query({})
 })
 
-const mailContent = computedAsync(async () => {
+const mailContent = computed(() => {
   if (!mail.value) return null
   if (!mail.value?.isHTML)
     return mail.value?.content ?? ''
