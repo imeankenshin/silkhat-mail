@@ -11,12 +11,11 @@ export const serverAuth = () => {
     secret: config.betterAuthSecret!,
     socialProviders: {
       google: {
-        prompt: 'consent',
         accessType: 'offline',
         clientId: config.googleClientId!,
         clientSecret: config.googleClientSecret!,
         callbackUrl: config.googleRedirectUrl!,
-        scope: ['https://www.googleapis.com/auth/gmail.readonly']
+        scope: ['https://mail.google.com/']
       }
     }
   })
