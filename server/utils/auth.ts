@@ -16,6 +16,7 @@ export const serverAuth = () => {
       }
       return _databaseAdapter
     },
+    secret: config.betterAuthSecret!,
     socialProviders: {
       google: {
         prompt: 'consent',
