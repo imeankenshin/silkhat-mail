@@ -18,7 +18,8 @@ export async function listHandler({ input }: listMailsOptions) {
   if (accessTokenError !== null) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
-      message: 'Failed to get Google access token.'
+      message: 'Failed to get Google access token.',
+      cause: accessTokenError
     })
   }
 
