@@ -3,7 +3,7 @@
   "scripts": {
     "dev": "nuxi dev",
     "build": "NODE_OPTIONS=--max-old-space-size=8192 nuxi build",
-    "preview": "npx nuxthub preview",
+    "preview": "pnpx nuxthub preview",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "lint": "eslint .",

@@ -35,7 +35,8 @@ export default defineNuxtConfig({
     googleClientId: '',
     googleClientSecret: '',
     googleRedirectUrl: '',
-    databaseUrl: ''
+    databaseUrl: '',
+    betterAuthSecret: ''
   },
   build: {
     transpile: ['trpc-nuxt']
