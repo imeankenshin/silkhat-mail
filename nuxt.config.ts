@@ -41,7 +41,12 @@ export default defineNuxtConfig({
     googleClientSecret: '',
     googleRedirectUrl: '',
     databaseUrl: '',
-    betterAuthSecret: ''
+    betterAuthSecret: '',
+    public: {
+      sentry: {
+        dsn: ''
+      }
+    }
   },
 
   build: {
