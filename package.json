@@ -16,6 +16,7 @@
     "@pinia/colada": "^0.15.0",
     "@pinia/colada-nuxt": "^0.1.1",
     "@pinia/nuxt": "^0.11.0",
+    "@sentry/nuxt": "^9",
     "@tailwindcss/vite": "^4.1.4",
     "@trpc/client": "^11.1.1",
     "@trpc/server": "^11.1.1",
@@ -25,6 +26,7 @@
     "clsx": "^2.1.1",
     "drizzle-kit": "^0.30.6",
     "drizzle-orm": "^0.41.0",
+    "import-in-the-middle": "^1.14.2",
     "nuxt": "^3.16.2",
     "pinia": "^3.0.2",
     "postgres": "^3.4.5",
@@ -54,6 +56,9 @@
     "onlyBuiltDependencies": [
       "sharp",
       "workerd"
-    ]
+    ],
+    "overrides": {
+      "@vercel/nft": "^0.27.4"
+    }
   }
 }

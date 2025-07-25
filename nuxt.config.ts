@@ -9,8 +9,10 @@ export default defineNuxtConfig({
     '@pinia/colada-nuxt',
     'shadcn-nuxt',
     '@nuxtjs/color-mode',
-    '@nuxt/icon'
+    '@nuxt/icon',
+    '@sentry/nuxt/module'
   ],
+
   devtools: {
     enabled: true,
     customTabs: [
@@ -26,31 +28,48 @@ export default defineNuxtConfig({
       }
     ]
   },
+
   css: ['~/assets/main.css'],
+
   colorMode: {
     storage: 'localStorage',
     classSuffix: ''
   },
+
   runtimeConfig: {
     googleClientId: '',
     googleClientSecret: '',
     googleRedirectUrl: '',
     databaseUrl: '',
-    betterAuthSecret: ''
+    betterAuthSecret: '',
+    public: {
+      sentry: {
+        dsn: ''
+      }
+    }
   },
+
   build: {
     transpile: ['trpc-nuxt']
   },
+
+  sourcemap: {
+    client: 'hidden'
+  },
+
   future: { compatibilityVersion: 4 },
   compatibilityDate: '2025-04-02',
+
   nitro: {
     experimental: {
       asyncContext: true
     }
   },
+
   vite: {
     plugins: [tailwindcss(), unctxPlugin.vite({})]
   },
+
   // Development config
   eslint: {
     config: {
@@ -58,6 +77,13 @@ export default defineNuxtConfig({
         quotes: 'single',
         commaDangle: 'never'
       }
+    }
+  },
+
+  sentry: {
+    sourceMapsUploadOptions: {
+      org: 'silkhat',
+      project: 'silkhat-mail'
     }
   }
 })

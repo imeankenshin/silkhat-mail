@@ -12,3 +12,5 @@ dist
 db.sqlite-*
 .data
 .wrangler
+# Sentry Config File
+.env.sentry-build-plugin
