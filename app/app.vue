@@ -10,14 +10,14 @@ watch(loggedIn, () => {
 
 useHead({
   htmlAttrs: { lang: 'en' },
-  link: [{ rel: 'icon', href: '/icon.png' }]
+  link: [{ rel: 'icon', href: '/icon.svg' }]
 })
 
 useSeoMeta({
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
-  title: 'Atidone',
+  title: 'Silk Hat Mail',
   description:
-    'A Nuxt demo hosted with edge-side rendering, authentication and queyring a Cloudflare D1 database',
+    'An open-source mail management app you’ll actually enjoy using.',
   ogImage: '/social-image.png',
   twitterImage: '/social-image.png',
   twitterCard: 'summary_large_image'
