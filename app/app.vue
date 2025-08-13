@@ -8,9 +8,21 @@ watch(loggedIn, () => {
   }
 })
 
+const colorMode = useColorMode()
+
+const themeColor = computed(() => colorMode.value === 'dark' ? 'oklch(0.205 0 0)' : 'oklch(0.985 0 0)')
+
 useHead({
   htmlAttrs: { lang: 'en' },
-  link: [{ rel: 'icon', href: '/icon.svg' }]
+  link: [
+    { rel: 'icon', type: 'image/svg+xml', sizes: 'any', href: '/icon.svg' },
+    { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/icon-32x32.png' },
+    { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/icon-16x16.png' },
+    { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' }
+  ],
+  meta: [
+    { name: 'theme-color', content: themeColor }
+  ]
 })
 
 useSeoMeta({
