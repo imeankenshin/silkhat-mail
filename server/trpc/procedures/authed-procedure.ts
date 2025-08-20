@@ -28,7 +28,7 @@ export const googleAuthedProcedure = authedProcedure.use(async ({ next }) => {
         )
       )
       .limit(1)
-      .then(([{ accessToken }]) => accessToken)
+      .then(rows => rows[0]?.accessToken ?? null)
   )
   if (getAccessTokenError) {
     throw new TRPCError({
