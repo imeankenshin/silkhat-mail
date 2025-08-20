@@ -1,6 +1,6 @@
 import { parse } from 'valibot'
 import { createTRPCRouter } from '../../init'
-import { authedProcedure } from '../../procedures/authed-procedure'
+import { googleAuthedProcedure } from '../../procedures/authed-procedure'
 import { listHandler } from './list.handler'
 import { VListMailsInputSchema } from './list.schema'
 import { toggleStarHandler } from './toggleStar.handler'
@@ -13,19 +13,19 @@ import { getHandler } from './get.handler'
 import { VGetMailsInputSchema } from './get.schema'
 
 export const mailRoutes = createTRPCRouter({
-  get: authedProcedure
+  get: googleAuthedProcedure
     .input(v => parse(VGetMailsInputSchema, v))
     .query(async ({ input }) => getHandler({ input })),
-  list: authedProcedure
+  list: googleAuthedProcedure
     .input(v => parse(VListMailsInputSchema, v))
     .query(async ({ input }) => listHandler({ input })),
-  toggleStar: authedProcedure
+  toggleStar: googleAuthedProcedure
     .input(v => parse(VToggleStarInputSchema, v))
     .mutation(({ input }) => toggleStarHandler({ input })),
-  archive: authedProcedure
+  archive: googleAuthedProcedure
     .input(v => parse(VArchiveMailInputSchema, v))
     .mutation(({ input }) => archiveMailHandler({ input })),
-  trash: authedProcedure
+  trash: googleAuthedProcedure
     .input(v => parse(VTrashMailInputSchema, v))
     .mutation(({ input }) => trashMailHandler({ input }))
 })

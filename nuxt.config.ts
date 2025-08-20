@@ -37,11 +37,13 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    googleClientId: '',
-    googleClientSecret: '',
-    googleRedirectUrl: '',
     databaseUrl: '',
     betterAuthSecret: '',
+    google: {
+      clientId: '',
+      clientSecret: '',
+      redirectUrl: ''
+    },
     public: {
       sentry: {
         dsn: ''
