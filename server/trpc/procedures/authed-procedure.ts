@@ -47,7 +47,7 @@ export const googleAuthedProcedure = authedProcedure.use(async ({ next }) => {
       cause: accountErr
     })
   }
-  if (!account) {
+  if (!(account && account.refreshToken)) {
     throw new TRPCError({ code: 'UNAUTHORIZED' })
   }
 
@@ -56,7 +56,7 @@ export const googleAuthedProcedure = authedProcedure.use(async ({ next }) => {
     = account.accessTokenExpiresAt && account.accessTokenExpiresAt < now
   let tokenToUse = account.accessToken ?? null
 
-  if ((!tokenToUse || expired) && account.refreshToken) {
+  if (!tokenToUse || expired) {
     const body = new URLSearchParams({
       client_id: config.google.clientId!,
       client_secret: config.google.clientSecret!,
