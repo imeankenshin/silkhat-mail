@@ -9,3 +9,8 @@ export const { use: useSession, call: provideSession } = createContext<{
   asyncContext: true,
   AsyncLocalStorage
 })
+
+export const { use: useGoogleAccessToken, call: provideGoogleAccessToken } = createContext<string>({
+  asyncContext: true,
+  AsyncLocalStorage
+})

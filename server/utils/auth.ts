@@ -12,9 +12,10 @@ export const serverAuth = () => {
     socialProviders: {
       google: {
         accessType: 'offline',
-        clientId: config.googleClientId!,
-        clientSecret: config.googleClientSecret!,
-        callbackUrl: config.googleRedirectUrl!,
+        prompt: 'select_account consent',
+        clientId: config.google.clientId!,
+        clientSecret: config.google.clientSecret!,
+        callbackUrl: config.google.redirectUrl!,
         scope: ['https://mail.google.com/']
       }
     }
