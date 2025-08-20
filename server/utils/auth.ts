@@ -12,7 +12,6 @@ export const serverAuth = () => {
     socialProviders: {
       google: {
         accessType: 'offline',
-        // @ts-expect-error: 'select_account consent' is actually a valid value.
         prompt: 'select_account consent',
         clientId: config.google.clientId!,
         clientSecret: config.google.clientSecret!,
