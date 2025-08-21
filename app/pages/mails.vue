@@ -115,8 +115,8 @@ watchEffect(() => {
       :open="!!selectedMailId"
       @update:open="selectedMailId = undefined"
     >
-      <UiSheetContent class="sm:max-w-2xl">
-        <div class="h-full overflow-y-auto">
+      <UiSheetContent class="sm:max-w-2xl overflow-y-auto outline-none">
+        <div class="h-full">
           <UiSheetHeader class="pt-12">
             <template v-if="mail">
               <h2 class="text-xl font-bold text-foreground">
