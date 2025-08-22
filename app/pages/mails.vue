@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { useDebounceFn } from '@vueuse/core'
+import { useDebounceFn, useEventListener } from '@vueuse/core'
 
 // サンプルメールデータ
 const { $trpc, $router } = useNuxtApp()
 const route = useRoute()
+const mailListEl = useTemplateRef('mail-list')
 const selectedMailId = ref(route.query.id as string | undefined)
+const selectedMail = ref<HTMLElement | null>(null)
 const { data: mail } = useQuery({
   key: () => ['mail', selectedMailId.value || 'null'],
   query: async () => {
@@ -17,6 +19,10 @@ const { data: mails } = useQuery({
   query: () => $trpc.mails.list.query({})
 })
 
+const firstMailEl = computed(() => {
+  const first = mailListEl.value?.children[0]
+  return first instanceof HTMLElement ? first : null
+})
 const mailContent = computed(() => {
   if (!mail.value) return null
   if (!mail.value?.isHTML)
@@ -59,12 +65,45 @@ const { mutate: trash } = useMailMutation(
   'Failed to trash mail'
 )
 
+useEventListener('keydown', (e) => {
+  if (selectedMailId.value) return
+  switch (e.key) {
+    case 'k':
+    case 'ArrowUp': {
+      e.preventDefault()
+      if (!selectedMail.value) {
+        selectedMail.value = firstMailEl.value
+        break
+      }
+      const prev = selectedMail.value.previousElementSibling
+      if (prev instanceof HTMLElement) selectedMail.value = prev
+      break
+    }
+    case 'j':
+    case 'ArrowDown': {
+      e.preventDefault()
+      if (!selectedMail.value) {
+        selectedMail.value = firstMailEl.value
+        break
+      }
+      const next = selectedMail.value.nextElementSibling
+      if (next instanceof HTMLElement) selectedMail.value = next
+      break
+    }
+  }
+})
+
 onBeforeRouteUpdate((to) => {
   selectedMailId.value = to.query.id as string | undefined
 })
 
 watchEffect(() => {
   $router.push(selectedMailId.value ? `/mails?id=${selectedMailId.value}` : '/mails')
+})
+
+watchEffect(() => {
+  if (!(selectedMail.value && typeof selectedMail.value.focus === 'function')) return
+  selectedMail.value.focus()
 })
 </script>
 
@@ -75,8 +114,8 @@ watchEffect(() => {
       :open="!!selectedMailId"
       @update:open="selectedMailId = undefined"
     >
-      <UiSheetContent class="sm:max-w-2xl">
-        <div class="h-full overflow-y-auto">
+      <UiSheetContent class="sm:max-w-2xl overflow-y-auto outline-none">
+        <div class="h-full">
           <UiSheetHeader class="pt-12">
             <template v-if="mail">
               <h2 class="text-xl font-bold text-foreground">
@@ -98,10 +137,10 @@ watchEffect(() => {
           </UiSheetHeader>
           <UiShadowRoot
             v-if="mailContent"
-            class="h-max overflow-auto px-4"
+            class="h-max px-4"
           >
             <div
-              class="contents"
+              style="display: contents;"
               v-html="mailContent"
             />
           </UiShadowRoot>
@@ -110,76 +149,87 @@ watchEffect(() => {
       </UiSheetContent>
       <div
         v-if="mails"
+        ref="mail-list"
+        role="list"
+        aria-label="Email list"
         class="flex-1 overflow-auto"
       >
-        <div>
-          <button
-            v-for="mail in mails"
-            :key="mail.id"
-            :to="`/mails?id=${mail.id}`"
-            class="w-full flex items-center gap-4 p-4 hover:bg-muted/50 cursor-pointer transition-colors"
-            @click="selectedMailId = mail.id"
+        <div
+          v-for="mail in mails"
+          :key="mail.id"
+          :to="`/mails?id=${mail.id}`"
+          role="listitem"
+          :aria-selected="selectedMailId === mail.id"
+          :aria-label="`Email from ${mail.from}: ${mail.subject}`"
+          tabindex="-1"
+          class="w-full flex outline-none items-center gap-4 p-4 hover:bg-muted/50 focus:bg-muted/50 cursor-pointer"
+          @click="selectedMailId = mail.id"
+          @keydown.enter.space.prevent="selectedMailId = mail.id"
+          @keydown.s.prevent="toggleStar(mail)"
+          @keydown.a.prevent="archive(mail)"
+          @keydown.d.prevent="trash(mail)"
+        >
+          <!-- 星アイコン -->
+          <UiButton
+            tabindex="-1"
+            variant="ghost"
+            size="icon"
+            @click.stop="toggleStar(mail)"
           >
-            <!-- 星アイコン -->
+            <Icon
+              :name="mail.labels.includes('STARRED') ? 'material-symbols:star-rounded' : 'material-symbols:star-outline-rounded'"
+              :class="mail.labels.includes('STARRED') ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'"
+              size="1.5em"
+            />
+          </UiButton>
+
+          <!-- アバター -->
+          <UiAvatar
+            :alt="mail.from || ''"
+            size="sm"
+            class="h-10 w-10 bg-muted"
+          />
+
+          <!-- メール情報 -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="font-medium text-foreground truncate">
+                {{ mail.from }}
+              </span>
+              <span class="text-muted-foreground truncate">
+                {{ mail.subject }}
+              </span>
+            </div>
+          </div>
+
+          <div>
             <UiButton
+              tabindex="-1"
               variant="ghost"
-              size="sm"
+              size="icon"
               class="h-8 w-8 p-0 hover:bg-transparent"
-              @click.stop="toggleStar(mail)"
+              @click.stop="archive(mail)"
             >
               <Icon
-                :name="mail.labels.includes('STARRED') ? 'material-symbols:star-rounded' : 'material-symbols:star-outline-rounded'"
-                :class="mail.labels.includes('STARRED') ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'"
+                class="text-muted-foreground"
+                name="material-symbols:archive-rounded"
                 size="1.5em"
               />
             </UiButton>
-
-            <!-- アバター -->
-            <UiAvatar
-              :alt="mail.from || ''"
-              size="sm"
-              class="h-10 w-10 bg-muted"
-            />
-
-            <!-- メール情報 -->
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="font-medium text-foreground truncate">
-                  {{ mail.from }}
-                </span>
-                <span class="text-muted-foreground truncate">
-                  {{ mail.subject }}
-                </span>
-              </div>
-            </div>
-
-            <div>
-              <UiButton
-                variant="ghost"
-                size="icon"
-                class="h-8 w-8 p-0 hover:bg-transparent"
-                @click.stop="archive(mail)"
-              >
-                <Icon
-                  class="text-muted-foreground"
-                  name="material-symbols:archive-rounded"
-                  size="1.5em"
-                />
-              </UiButton>
-              <UiButton
-                variant="ghost"
-                size="icon"
-                class="h-8 w-8 p-0 hover:bg-transparent"
-                @click.stop="trash(mail)"
-              >
-                <Icon
-                  class="text-muted-foreground"
-                  name="material-symbols:delete-rounded"
-                  size="1.5em"
-                />
-              </UiButton>
-            </div>
-          </button>
+            <UiButton
+              tabindex="-1"
+              variant="ghost"
+              size="icon"
+              class="h-8 w-8 p-0 hover:bg-transparent"
+              @click.stop="trash(mail)"
+            >
+              <Icon
+                class="text-muted-foreground"
+                name="material-symbols:delete-rounded"
+                size="1.5em"
+              />
+            </UiButton>
+          </div>
         </div>
       </div>
     </UiSheet>
