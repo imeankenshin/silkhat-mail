@@ -67,7 +67,6 @@ const { mutate: trash } = useMailMutation(
 
 useEventListener('keydown', (e) => {
   if (selectedMailId.value) return
-  console.log(e.key)
   switch (e.key) {
     case 'k':
     case 'ArrowUp': {
@@ -103,7 +102,7 @@ watchEffect(() => {
 })
 
 watchEffect(() => {
-  if (!selectedMail.value) return
+  if (!(selectedMail.value && typeof selectedMail.value.focus === 'function')) return
   selectedMail.value.focus()
 })
 </script>
@@ -151,19 +150,24 @@ watchEffect(() => {
       <div
         v-if="mails"
         ref="mail-list"
+        role="list"
+        aria-label="Email list"
         class="flex-1 overflow-auto"
       >
         <div
           v-for="mail in mails"
           :key="mail.id"
           :to="`/mails?id=${mail.id}`"
+          role="listitem"
+          :aria-selected="selectedMailId === mail.id"
+          :aria-label="`Email from ${mail.from}: ${mail.subject}`"
           tabindex="-1"
           class="w-full flex outline-none items-center gap-4 p-4 hover:bg-muted/50 focus:bg-muted/50 cursor-pointer"
           @click="selectedMailId = mail.id"
-          @keydown.enter.space="selectedMailId = mail.id"
-          @keydown.s="toggleStar(mail)"
-          @keydown.a="archive(mail)"
-          @keydown.d="trash(mail)"
+          @keydown.enter.space.prevent="selectedMailId = mail.id"
+          @keydown.s.prevent="toggleStar(mail)"
+          @keydown.a.prevent="archive(mail)"
+          @keydown.d.prevent="trash(mail)"
         >
           <!-- 星アイコン -->
           <UiButton
