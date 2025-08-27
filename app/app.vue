@@ -39,7 +39,7 @@ useSeoMeta({
 <template>
   <NuxtLayout>
     <NuxtPage />
-    <AppMailComposeWindow />
+    <AppMailComposeWindowSet />
     <UiSonner />
   </NuxtLayout>
 </template>

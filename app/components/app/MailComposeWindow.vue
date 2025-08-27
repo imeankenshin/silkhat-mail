@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'close'): void
 }>()
 
@@ -40,7 +40,8 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
 
 <template>
   <form
-    class="bg-card text-card-foreground max-w-xl w-full fixed bottom-0 right-16 border-1 border-border rounded rounded-b-none border-b-0"
+    class="bg-card text-card-foreground max-w-xl w-full shrink-0 border-1 border-border rounded rounded-b-none border-b-0 data-[minimized]:w-fit"
+    :data-minimized="minimized ? '' : undefined"
     @submit.prevent="send($event)"
     @keydown.tab.exact="focusTo($event)"
     @keydown.tab.shift="focusTo($event, 'last')"
@@ -49,8 +50,9 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
     <div class="flex items-center px-3 py-3 justify-between">
       <span
         :title="windowName"
-        class="whitespace-nowrap overflow-hidden text-ellipsis"
-      >{{ windowName || "New message" }}</span>
+        class="whitespace-nowrap overflow-hidden text-ellipsis min-w-xs"
+      >{{ windowName || "New message"
+      }}</span>
       <div class="flex">
         <UiButton
           size="icon"
@@ -68,7 +70,7 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
         <UiButton
           size="icon"
           variant="ghost"
-          @click="$emit('close')"
+          @click="emit('close')"
         >
           <Icon name="material-symbols:close-rounded" />
         </UiButton>
