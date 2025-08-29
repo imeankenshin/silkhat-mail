@@ -7,7 +7,19 @@ const emit = defineEmits<{
 
 const { $trpc } = useNuxtApp()
 
-const minimized = ref(false)
+const windowSize = ref<'normal' | 'minimized' | 'opened-in-full'>('normal')
+const minimized = computed({
+  get: () => windowSize.value === 'minimized',
+  set: (value: boolean) => {
+    windowSize.value = value ? 'minimized' : 'normal'
+  }
+})
+const openedInFull = computed({
+  get: () => windowSize.value === 'opened-in-full',
+  set: (value: boolean) => {
+    windowSize.value = value ? 'opened-in-full' : 'normal'
+  }
+})
 const windowName = ref('')
 
 const { mutate: send, isLoading } = useMutation({
@@ -39,7 +51,9 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
 </script>
 
 <template>
+  <!-- 通常表示（ダイアログではない） -->
   <form
+    v-show="!openedInFull"
     class="bg-card text-card-foreground max-w-xl w-full shrink-0 border-1 border-border rounded rounded-b-none border-b-0 data-[minimized]:w-fit"
     :data-minimized="minimized ? '' : undefined"
     @submit.prevent="send($event)"
@@ -59,13 +73,14 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
           variant="ghost"
           @click="minimized = !minimized"
         >
-          <Icon name="material-symbols:minimize-rounded" />
+          <Icon :name="minimized ? 'material-symbols:maximize-rounded' : 'material-symbols:minimize-rounded'" />
         </UiButton>
         <UiButton
           size="icon"
           variant="ghost"
+          @click="openedInFull = !openedInFull"
         >
-          <Icon name="material-symbols:open-in-full-rounded" />
+          <Icon :name="openedInFull ? 'material-symbols:close-fullscreen-rounded' : 'material-symbols:open-in-full-rounded'" />
         </UiButton>
         <UiButton
           size="icon"
@@ -115,4 +130,60 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
       </div>
     </div>
   </form>
+
+  <!-- 全画面ダイアログ表示 -->
+  <AppMailComposeWIndowFullScreen
+    v-model:open="openedInFull"
+    :window-name="windowName"
+    @close="openedInFull = false"
+    @minimize="minimized = true"
+  >
+    <form
+      class="flex flex-col gap-4 h-full *:min-w-0"
+      @submit.prevent="send($event)"
+      @keydown.tab.exact="focusTo($event)"
+      @keydown.tab.shift="focusTo($event, 'last')"
+    >
+      <div class="flex flex-col space-y-2">
+        <UiLabel for="to-fullscreen">
+          To
+        </UiLabel>
+        <UiInput
+          id="to-fullscreen"
+          name="to"
+          class="w-full"
+        />
+      </div>
+      <div class="flex flex-col space-y-2">
+        <UiLabel for="subject-fullscreen">
+          Subject
+        </UiLabel>
+        <UiInput
+          id="subject-fullscreen"
+          v-model="windowName"
+          name="subject"
+          class="w-full"
+        />
+      </div>
+      <div class="flex flex-col space-y-2 h-full">
+        <UiLabel for="content-fullscreen">
+          Content
+        </UiLabel>
+        <UiTextarea
+          id="content-fullscreen"
+          name="content"
+          class="w-full h-full resize-y"
+        />
+      </div>
+      <div class="flex justify-between">
+        <UiButton
+          type="submit"
+          :disabled="isLoading"
+        >
+          <Icon name="material-symbols:send-rounded" />
+          Send
+        </UiButton>
+      </div>
+    </form>
+  </AppMailComposeWIndowFullScreen>
 </template>
