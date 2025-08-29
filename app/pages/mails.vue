@@ -7,6 +7,7 @@ definePageMeta({
 // サンプルメールデータ
 const { $trpc } = useNuxtApp()
 const mailListEl = useTemplateRef('mail-list')
+const route = useRoute()
 const params = useUrlSearchParams<{
   mailId: string | undefined
   is: string | undefined
@@ -20,10 +21,8 @@ const { data: mail } = useQuery({
   }
 })
 const { data: mails } = useQuery({
-  key: () => ['mails', `is:${params.is || ''}`],
-  query: () => $trpc.mails.list.query({
-    q: `is:${params.is || ''}`
-  })
+  key: () => ['mails', { is: params.is }],
+  query: () => $trpc.mails.list.query(params.is ? { q: `is:${params.is}` } : {})
 })
 
 const firstMailEl = computed(() => {
@@ -104,6 +103,12 @@ onBeforeRouteUpdate((to) => {
   params.mailId = to.query.id as string | undefined
 })
 
+onMounted(() => {
+  if (!params.mailId && typeof route.query.id === 'string') {
+    params.mailId = route.query.id
+  }
+})
+
 watchEffect(() => {
   if (!(selectedMail.value && typeof selectedMail.value.focus === 'function')) return
   selectedMail.value.focus()
@@ -115,7 +120,7 @@ watchEffect(() => {
     <!-- メール一覧 -->
     <UiSheet
       :open="!!params.mailId"
-      @update:open="params.mailId= undefined"
+      @update:open="params.mailId = undefined"
     >
       <UiSheetContent class="sm:max-w-2xl overflow-y-auto outline-none">
         <div class="h-full">
@@ -162,12 +167,12 @@ watchEffect(() => {
           :key="mail.id"
           :to="`/mails?id=${mail.id}`"
           role="listitem"
-          :aria-selected="params.mailId=== mail.id"
+          :aria-selected="params.mailId === mail.id"
           :aria-label="`Email from ${mail.from}: ${mail.subject}`"
           tabindex="-1"
           class="w-full flex outline-none items-center gap-4 p-4 hover:bg-muted/50 focus:bg-muted/50 cursor-pointer"
-          @click="params.mailId= mail.id"
-          @keydown.enter.space.prevent="params.mailId= mail.id"
+          @click="params.mailId = mail.id"
+          @keydown.enter.space.prevent="params.mailId = mail.id"
           @keydown.s.prevent="toggleStar(mail)"
           @keydown.a.prevent="archive(mail)"
           @keydown.d.prevent="trash(mail)"
