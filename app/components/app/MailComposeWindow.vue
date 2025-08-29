@@ -8,6 +8,11 @@ const emit = defineEmits<{
 const { $trpc } = useNuxtApp()
 
 const windowSize = ref<'normal' | 'minimized' | 'opened-in-full'>('normal')
+
+const to = ref('')
+const subject = ref('')
+const content = ref('')
+
 const minimized = computed({
   get: () => windowSize.value === 'minimized',
   set: (value: boolean) => {
@@ -20,15 +25,13 @@ const openedInFull = computed({
     windowSize.value = value ? 'opened-in-full' : 'normal'
   }
 })
-const windowName = ref('')
 
 const { mutate: send, isLoading } = useMutation({
-  mutation: (event: Event) => {
-    const formData = new FormData(event.currentTarget as HTMLFormElement)
+  mutation: () => {
     return $trpc.mails.send.mutate({
-      to: formData.get('to') as string,
-      subject: formData.get('subject') as string,
-      content: formData.get('content') as string
+      to: to.value,
+      subject: subject.value,
+      content: content.value
     })
   },
   onError(err) {
@@ -56,17 +59,18 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
     v-show="!openedInFull"
     class="bg-card text-card-foreground max-w-xl w-full shrink-0 border-1 border-border rounded rounded-b-none border-b-0 data-[minimized]:w-fit"
     :data-minimized="minimized ? '' : undefined"
-    @submit.prevent="send($event)"
+    @submit.prevent="send()"
     @keydown.tab.exact="focusTo($event)"
     @keydown.tab.shift="focusTo($event, 'last')"
     @keydown.exact.stop
   >
     <div class="flex items-center px-3 py-3 justify-between">
       <span
-        :title="windowName"
+        :title="subject"
         class="whitespace-nowrap overflow-hidden text-ellipsis min-w-xs"
-      >{{ windowName || "New message"
-      }}</span>
+      >
+        {{ subject || "New message" }}
+      </span>
       <div class="flex">
         <UiButton
           size="icon"
@@ -99,14 +103,17 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
         <UiLabel for="to">
           To
         </UiLabel>
-        <UiInput name="to" />
+        <UiInput
+          v-model="to"
+          name="to"
+        />
       </div>
       <div class="flex flex-col space-y-1.5">
         <UiLabel for="subject">
           Subject
         </UiLabel>
         <UiInput
-          v-model="windowName"
+          v-model="subject"
           name="subject"
         />
       </div>
@@ -115,6 +122,7 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
           Content
         </UiLabel>
         <UiTextarea
+          v-model="content"
           name="content"
           class="w-full min-h-40"
         />
@@ -134,13 +142,13 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
   <!-- 全画面ダイアログ表示 -->
   <AppMailComposeWIndowFullScreen
     v-model:open="openedInFull"
-    :window-name="windowName"
+    :window-name="subject"
     @close="openedInFull = false"
     @minimize="minimized = true"
   >
     <form
       class="flex flex-col gap-4 h-full *:min-w-0"
-      @submit.prevent="send($event)"
+      @submit.prevent="send()"
       @keydown.tab.exact="focusTo($event)"
       @keydown.tab.shift="focusTo($event, 'last')"
     >
@@ -150,6 +158,7 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
         </UiLabel>
         <UiInput
           id="to-fullscreen"
+          v-model="to"
           name="to"
           class="w-full"
         />
@@ -160,7 +169,7 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
         </UiLabel>
         <UiInput
           id="subject-fullscreen"
-          v-model="windowName"
+          v-model="subject"
           name="subject"
           class="w-full"
         />
@@ -171,6 +180,7 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
         </UiLabel>
         <UiTextarea
           id="content-fullscreen"
+          v-model="content"
           name="content"
           class="w-full h-full resize-y"
         />
