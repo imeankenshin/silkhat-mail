@@ -66,7 +66,7 @@ const { mutate: trash } = useMailMutation(
 )
 
 useEventListener('keydown', (e) => {
-  if (selectedMailId.value) return
+  if (selectedMailId.value || e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
   switch (e.key) {
     case 'k':
     case 'ArrowUp': {
