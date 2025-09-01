@@ -89,6 +89,7 @@ onBeforeUnmount(() => {
     @submit.prevent="send()"
     @keydown.tab.exact="focusTo($event)"
     @keydown.tab.shift="focusTo($event, 'last')"
+    @keydown.escape.prevent="emit('close')"
     @keydown.exact.stop
   >
     <div class="flex items-center px-3 py-3 justify-between">
