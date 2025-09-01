@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { debouncedWatch } from '@vueuse/core'
 import { toast } from 'vue-sonner'
 
 const emit = defineEmits<{
@@ -40,6 +41,16 @@ const { mutate: send, isLoading } = useMutation({
   }
 })
 
+const { mutate: save, status: saveStatus, asyncStatus: saveAsyncStatus, reset: resetSave } = useMutation({
+  mutation: () => {
+    return new Promise(resolve => setTimeout(resolve, 3000))
+  },
+  onError(err) {
+    console.error(err)
+    toast.error('Failed to save mail')
+  }
+})
+
 const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
   if (!(event.currentTarget instanceof HTMLElement)) return
   const focusableEls = event.currentTarget.querySelectorAll('input, textarea, button')
@@ -51,6 +62,22 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
   event.preventDefault()
   if (el instanceof HTMLElement) el.focus()
 }
+
+debouncedWatch([to, subject, content], () => {
+  save()
+}, {
+  debounce: 1600
+})
+
+debouncedWatch(saveStatus, () => {
+  if (saveStatus.value === 'success') resetSave()
+}, {
+  debounce: 6000
+})
+
+onBeforeUnmount(() => {
+  if ((to.value || subject.value || content.value) || saveStatus.value === 'success') save()
+})
 </script>
 
 <template>
@@ -84,7 +111,9 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
           variant="ghost"
           @click="openedInFull = !openedInFull"
         >
-          <Icon :name="openedInFull ? 'material-symbols:close-fullscreen-rounded' : 'material-symbols:open-in-full-rounded'" />
+          <Icon
+            :name="openedInFull ? 'material-symbols:close-fullscreen-rounded' : 'material-symbols:open-in-full-rounded'"
+          />
         </UiButton>
         <UiButton
           size="icon"
@@ -127,7 +156,7 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
           class="w-full min-h-40"
         />
       </div>
-      <div class="flex">
+      <div class="flex justify-between">
         <UiButton
           type="submit"
           :disabled="isLoading"
@@ -135,6 +164,27 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
           <Icon name="material-symbols:send-rounded" />
           Send
         </UiButton>
+        <div
+          v-if="saveAsyncStatus === 'loading'"
+          class="flex items-center gap-2"
+        >
+          <Icon name="material-symbols:hourglass-bottom-rounded" />
+          <span class="text-xs">Saving the progress...</span>
+        </div>
+        <div
+          v-else-if="saveStatus === 'error'"
+          class="flex items-center gap-2"
+        >
+          <Icon name="material-symbols:error-rounded" />
+          <span class="text-xs">Failed to save the progress</span>
+        </div>
+        <div
+          v-else-if="saveStatus === 'success'"
+          class="flex items-center gap-2 text-emerald-500"
+        >
+          <Icon name="material-symbols:check-rounded" />
+          <span class="text-xs">Saved as a draft</span>
+        </div>
       </div>
     </div>
   </form>
@@ -193,6 +243,27 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
           <Icon name="material-symbols:send-rounded" />
           Send
         </UiButton>
+        <div
+          v-if="saveAsyncStatus === 'loading'"
+          class="flex items-center gap-2"
+        >
+          <Icon name="material-symbols:hourglass-bottom-rounded" />
+          <span class="text-xs">Saving the progress...</span>
+        </div>
+        <div
+          v-else-if="saveStatus === 'error'"
+          class="flex items-center gap-2"
+        >
+          <Icon name="material-symbols:error-rounded" />
+          <span class="text-xs">Failed to save the progress</span>
+        </div>
+        <div
+          v-else-if="saveStatus === 'success'"
+          class="flex items-center gap-2 text-emerald-500"
+        >
+          <Icon name="material-symbols:check-rounded" />
+          <span class="text-xs">Saved as a draft</span>
+        </div>
       </div>
     </form>
   </AppMailComposeWIndowFullScreen>
