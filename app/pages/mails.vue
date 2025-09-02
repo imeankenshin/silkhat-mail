@@ -1,22 +1,28 @@
 <script setup lang="ts">
-import { useDebounceFn, useEventListener } from '@vueuse/core'
+import { useDebounceFn, useEventListener, useUrlSearchParams } from '@vueuse/core'
 
+definePageMeta({
+  key: ({ query }) => `mails/${query.is || ''}`
+})
 // サンプルメールデータ
-const { $trpc, $router } = useNuxtApp()
-const route = useRoute()
+const { $trpc } = useNuxtApp()
 const mailListEl = useTemplateRef('mail-list')
-const selectedMailId = ref(route.query.id as string | undefined)
+const route = useRoute()
+const params = useUrlSearchParams<{
+  mailId: string | undefined
+  is: string | undefined
+}>('history')
 const selectedMail = ref<HTMLElement | null>(null)
 const { data: mail } = useQuery({
-  key: () => ['mail', selectedMailId.value || 'null'],
+  key: () => ['mail', params.mailId || 'null'],
   query: async () => {
-    if (!selectedMailId.value) return null
-    return await $trpc.mails.get.query({ id: selectedMailId.value as string })
+    if (!params.mailId) return null
+    return await $trpc.mails.get.query({ id: params.mailId })
   }
 })
 const { data: mails } = useQuery({
-  key: ['mails'],
-  query: () => $trpc.mails.list.query({})
+  key: () => ['mails', { is: params.is }],
+  query: () => $trpc.mails.list.query(params.is ? { q: `is:${params.is}` } : {})
 })
 
 const firstMailEl = computed(() => {
@@ -66,7 +72,7 @@ const { mutate: trash } = useMailMutation(
 )
 
 useEventListener('keydown', (e) => {
-  if (selectedMailId.value) return
+  if (params.mailId) return
   switch (e.key) {
     case 'k':
     case 'ArrowUp': {
@@ -94,11 +100,13 @@ useEventListener('keydown', (e) => {
 })
 
 onBeforeRouteUpdate((to) => {
-  selectedMailId.value = to.query.id as string | undefined
+  params.mailId = to.query.id as string | undefined
 })
 
-watchEffect(() => {
-  $router.push(selectedMailId.value ? `/mails?id=${selectedMailId.value}` : '/mails')
+onMounted(() => {
+  if (!params.mailId && typeof route.query.id === 'string') {
+    params.mailId = route.query.id
+  }
 })
 
 watchEffect(() => {
@@ -111,8 +119,8 @@ watchEffect(() => {
   <div class="flex flex-col h-full bg-background">
     <!-- メール一覧 -->
     <UiSheet
-      :open="!!selectedMailId"
-      @update:open="selectedMailId = undefined"
+      :open="!!params.mailId"
+      @update:open="params.mailId = undefined"
     >
       <UiSheetContent class="sm:max-w-2xl overflow-y-auto outline-none">
         <div class="h-full">
@@ -159,12 +167,12 @@ watchEffect(() => {
           :key="mail.id"
           :to="`/mails?id=${mail.id}`"
           role="listitem"
-          :aria-selected="selectedMailId === mail.id"
+          :aria-selected="params.mailId === mail.id"
           :aria-label="`Email from ${mail.from}: ${mail.subject}`"
           tabindex="-1"
           class="w-full flex outline-none items-center gap-4 p-4 hover:bg-muted/50 focus:bg-muted/50 cursor-pointer"
-          @click="selectedMailId = mail.id"
-          @keydown.enter.space.prevent="selectedMailId = mail.id"
+          @click="params.mailId = mail.id"
+          @keydown.enter.space.prevent="params.mailId = mail.id"
           @keydown.s.prevent="toggleStar(mail)"
           @keydown.a.prevent="archive(mail)"
           @keydown.d.prevent="trash(mail)"
