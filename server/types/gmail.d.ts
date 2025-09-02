@@ -30,6 +30,11 @@ interface GmailMessage {
   payload?: GmailMessagePayload | null
 }
 
+interface GmailDraft {
+  id: string
+  message?: GmailMessage
+}
+
 interface ListMessagesResponse {
   messages?: { id?: string | null }[]
   nextPageToken?: string | null

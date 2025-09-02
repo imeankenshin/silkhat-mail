@@ -11,6 +11,8 @@ import { trashMailHandler } from './trash.handler'
 import { VTrashMailInputSchema } from './trash.schema'
 import { getHandler } from './get.handler'
 import { VGetMailsInputSchema } from './get.schema'
+import { sendHandler } from './send.handler'
+import { VSendMailInputSchema } from './send.schema'
 
 export const mailRoutes = createTRPCRouter({
   get: googleAuthedProcedure
@@ -27,5 +29,8 @@ export const mailRoutes = createTRPCRouter({
     .mutation(({ input }) => archiveMailHandler({ input })),
   trash: googleAuthedProcedure
     .input(v => parse(VTrashMailInputSchema, v))
-    .mutation(({ input }) => trashMailHandler({ input }))
+    .mutation(({ input }) => trashMailHandler({ input })),
+  send: googleAuthedProcedure
+    .input(v => parse(VSendMailInputSchema, v))
+    .mutation(({ input }) => sendHandler({ input }))
 })

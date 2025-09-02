@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { data: session } = await authClient.useSession(useFetch)
+const { createDraft } = useDraftsStore()
 const loggedIn = computed(() => !!session.value)
 const logIn = () => {
   authClient.signIn.social({
@@ -38,7 +39,14 @@ const commonSidebarGroup = [
 
 <template>
   <UiSidebar>
-    <UiSidebarHeader class="p-4" />
+    <UiSidebarHeader class="py-4 flex justify-between">
+      <UiButton
+        size="icon"
+        variant="ghost"
+        icon="material-symbols:edit-rounded"
+        @click="createDraft()"
+      />
+    </UiSidebarHeader>
     <UiSidebarContent>
       <UiSidebarGroup>
         <UiSidebarGroupContent>
