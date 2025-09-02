@@ -3,13 +3,13 @@ import { useGoogleAccessToken } from '../../context/session'
 import type { TUpdateDraftInputSchema } from './update.schema'
 import { GmailService } from '~~/server/services/gmail/gmail.service'
 
-type CreateDraftOptions = {
+type UpdateDraftOptions = {
   input: TUpdateDraftInputSchema
 }
 
 export const updateDraftHandler = async ({
   input
-}: CreateDraftOptions) => {
+}: UpdateDraftOptions) => {
   // TODO: Gmail APIを使用してドラフトを作成
   const gmailService = new GmailService()
   const accessToken = useGoogleAccessToken()

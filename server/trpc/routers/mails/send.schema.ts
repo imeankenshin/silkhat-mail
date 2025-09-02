@@ -1,7 +1,7 @@
 import * as v from 'valibot'
 
 export const VSendMailInputSchema = v.object({
-  to: v.string(),
+  to: v.pipe(v.string(), v.trim(), v.nonEmpty(), v.email()),
   subject: v.string(),
   content: v.string()
 })
