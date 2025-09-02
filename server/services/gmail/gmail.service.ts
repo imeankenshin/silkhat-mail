@@ -50,20 +50,75 @@ export class GmailService implements IGmailService {
     accessToken: string,
     input: { to?: string, subject?: string, content?: string }
   ) {
-    const { error: createDraftError } = await tryCatch(
-      this.#fetchGmailApi(accessToken, `/users/me/drafts`, {
+    const emailContent = [
+      `Content-Type: text/plain; charset="UTF-8"`,
+      `MIME-Version: 1.0`,
+      `Content-Transfer-Encoding: 7bit`,
+      `to: ${input.to}`,
+      `subject: ${input.subject}`,
+      ``,
+      `${input.content}`
+    ].join('\n')
+
+    // メールメッセージをBase64エンコード
+    const base64EncodedEmail = Buffer.from(emailContent)
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '')
+
+    const { error: createDraftError, data: draft } = await tryCatch(
+      this.#fetchGmailApi<GmailDraft>(accessToken, `/users/me/drafts`, {
         method: 'POST',
         body: JSON.stringify({
-          to: input.to,
-          subject: input.subject,
-          message: input.content
+          message: {
+            raw: base64EncodedEmail
+          }
         })
       })
     )
     if (createDraftError !== null) {
       return failure(createDraftError)
     }
-    return success(undefined)
+    return success(draft)
+  }
+
+  async updateDraft(
+    accessToken: string,
+    id: string,
+    input: { to?: string, subject?: string, content?: string }
+  ) {
+    const emailContent = [
+      `Content-Type: text/plain; charset="UTF-8"`,
+      `MIME-Version: 1.0`,
+      `Content-Transfer-Encoding: 7bit`,
+      `to: ${input.to}`,
+      `subject: ${input.subject}`,
+      ``,
+      `${input.content}`
+    ].join('\n')
+
+    // メールメッセージをBase64エンコード
+    const base64EncodedEmail = Buffer.from(emailContent)
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '')
+
+    const { error: createDraftError, data: draft } = await tryCatch(
+      this.#fetchGmailApi<GmailDraft>(accessToken, `/users/me/drafts/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          message: {
+            raw: base64EncodedEmail
+          }
+        })
+      })
+    )
+    if (createDraftError !== null) {
+      return failure(createDraftError)
+    }
+    return success(draft)
   }
 
   /**

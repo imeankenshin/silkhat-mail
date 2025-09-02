@@ -13,6 +13,7 @@ const windowSize = ref<'normal' | 'minimized' | 'opened-in-full'>('normal')
 const to = ref('')
 const subject = ref('')
 const content = ref('')
+const draftId = ref<string | null>(null)
 
 const minimized = computed({
   get: () => windowSize.value === 'minimized',
@@ -42,8 +43,21 @@ const { mutate: send, isLoading } = useMutation({
 })
 
 const { mutate: save, status: saveStatus, asyncStatus: saveAsyncStatus, reset: resetSave } = useMutation({
-  mutation: () => {
-    return new Promise(resolve => setTimeout(resolve, 3000))
+  mutation: () =>
+    draftId.value
+      ? $trpc.drafts.update.mutate({
+          draftId: draftId.value,
+          to: to.value,
+          subject: subject.value,
+          content: content.value
+        })
+      : $trpc.drafts.create.mutate({
+          to: to.value,
+          subject: subject.value,
+          content: content.value
+        }),
+  onSuccess(draft) {
+    draftId.value = draft.id
   },
   onError(err) {
     console.error(err)
