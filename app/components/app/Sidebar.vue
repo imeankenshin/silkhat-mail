@@ -17,22 +17,22 @@ const commonSidebarGroup = [
   {
     name: 'Starred',
     icon: 'material-symbols:star-rounded',
-    to: '/mails'
+    to: '/mails?is=STARRED'
   },
   {
     name: 'Sent',
     icon: 'material-symbols:send-rounded',
-    to: '/mails'
+    to: '/mails?is=SENT'
   },
   {
     name: 'Drafts',
     icon: 'material-symbols:drafts-rounded',
-    to: '/mails'
+    to: '/mails?is=DRAFT'
   },
   {
     name: 'Promotions',
     icon: 'material-symbols:sell',
-    to: '/mails'
+    to: '/mails?is=PROMOTION'
   }
 ]
 </script>
