@@ -205,7 +205,7 @@ onBeforeUnmount(() => {
   </form>
 
   <!-- 全画面ダイアログ表示 -->
-  <AppMailComposeWIndowFullScreen
+  <AppMailComposeWindowFullScreen
     v-model:open="openedInFull"
     :window-name="subject"
     @close="openedInFull = false"
@@ -281,5 +281,5 @@ onBeforeUnmount(() => {
         </div>
       </div>
     </form>
-  </AppMailComposeWIndowFullScreen>
+  </AppMailComposeWindowFullScreen>
 </template>
