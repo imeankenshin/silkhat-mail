@@ -84,7 +84,7 @@ debouncedWatch([to, subject, content], () => {
 })
 
 debouncedWatch(saveStatus, () => {
-  if (saveStatus.value === 'success') resetSave()
+  if (saveStatus.value !== 'pending') resetSave()
 }, {
   debounce: 6000
 })
@@ -183,7 +183,7 @@ onBeforeUnmount(() => {
           v-if="saveAsyncStatus === 'loading'"
           class="flex items-center gap-2"
         >
-          <Icon name="material-symbols:hourglass-bottom-rounded" />
+          <UiLoadingIndicator />
           <span class="text-xs">Saving the progress...</span>
         </div>
         <div
@@ -262,7 +262,7 @@ onBeforeUnmount(() => {
           v-if="saveAsyncStatus === 'loading'"
           class="flex items-center gap-2"
         >
-          <Icon name="material-symbols:hourglass-bottom-rounded" />
+          <UiLoadingIndicator />
           <span class="text-xs">Saving the progress...</span>
         </div>
         <div
