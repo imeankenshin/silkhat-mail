@@ -183,7 +183,7 @@ onBeforeUnmount(() => {
           v-if="saveAsyncStatus === 'loading'"
           class="flex items-center gap-2"
         >
-          <UiLoadingIndicator />
+          <UiLoadingIndicator class="size-5" />
           <span class="text-xs">Saving the progress...</span>
         </div>
         <div
@@ -262,7 +262,7 @@ onBeforeUnmount(() => {
           v-if="saveAsyncStatus === 'loading'"
           class="flex items-center gap-2"
         >
-          <UiLoadingIndicator />
+          <UiLoadingIndicator class="size-5" />
           <span class="text-xs">Saving the progress...</span>
         </div>
         <div
