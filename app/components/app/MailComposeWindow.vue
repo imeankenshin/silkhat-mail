@@ -174,7 +174,7 @@ onBeforeUnmount(() => {
       <div class="flex justify-between">
         <UiButton
           type="submit"
-          :disabled="isLoading"
+          :disabled="isLoading || !to"
         >
           <Icon name="material-symbols:send-rounded" />
           Send
@@ -253,7 +253,7 @@ onBeforeUnmount(() => {
       <div class="flex justify-between">
         <UiButton
           type="submit"
-          :disabled="isLoading"
+          :disabled="isLoading || !to"
         >
           <Icon name="material-symbols:send-rounded" />
           Send

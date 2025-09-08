@@ -8,6 +8,14 @@ const formattableFromPatterns = [
 ] as const
 
 export class GmailService implements IGmailService {
+  /**
+   * Sanitize header values to prevent header injection
+   * Removes CR/LF characters
+   */
+  #sanitizeHeader(value: string): string {
+    return value.replace(/[\r\n]/g, '')
+  }
+
   async sendMessage(
     accessToken: string,
     input: { to: string, subject: string, content: string }
@@ -50,15 +58,21 @@ export class GmailService implements IGmailService {
     accessToken: string,
     input: { to?: string, subject?: string, content?: string }
   ) {
-    const emailContent = [
+    const headers = [
       `Content-Type: text/plain; charset="UTF-8"`,
       `MIME-Version: 1.0`,
-      `Content-Transfer-Encoding: 7bit`,
-      `to: ${input.to}`,
-      `subject: ${input.subject}`,
-      ``,
-      `${input.content}`
-    ].join('\n')
+      `Content-Transfer-Encoding: 7bit`
+    ]
+
+    if (input.to) {
+      headers.push(`to: ${this.#sanitizeHeader(input.to)}`)
+    }
+    if (input.subject) {
+      headers.push(`subject: ${this.#sanitizeHeader(input.subject)}`)
+    }
+
+    const sanitizedContent = input.content ? this.#sanitizeHeader(input.content) : ''
+    const emailContent = [...headers, '', sanitizedContent].join('\n')
 
     // メールメッセージをBase64エンコード
     const base64EncodedEmail = Buffer.from(emailContent)
@@ -88,16 +102,21 @@ export class GmailService implements IGmailService {
     id: string,
     input: { to?: string, subject?: string, content?: string }
   ) {
-    const emailContent = [
-      `Content-Type: text/plain; charset="UTF-8"`,
-      `MIME-Version: 1.0`,
-      `Content-Transfer-Encoding: 7bit`,
-      `to: ${input.to}`,
-      `subject: ${input.subject}`,
-      ``,
-      `${input.content}`
-    ].join('\n')
+    const headers = [
+      'Content-Type: text/plain; charset="UTF-8"',
+      'MIME-Version: 1.0',
+      'Content-Transfer-Encoding: 7bit'
+    ]
 
+    if (input.to) {
+      headers.push(`to: ${this.#sanitizeHeader(input.to)}`)
+    }
+    if (input.subject) {
+      headers.push(`subject: ${this.#sanitizeHeader(input.subject)}`)
+    }
+
+    const sanitizedContent = input.content ? this.#sanitizeHeader(input.content) : ''
+    const emailContent = [...headers, '', sanitizedContent].join('\n')
     // メールメッセージをBase64エンコード
     const base64EncodedEmail = Buffer.from(emailContent)
       .toString('base64')
@@ -309,21 +328,30 @@ export class GmailService implements IGmailService {
 
       if (htmlPart) {
         return {
-          content: Buffer.from(htmlPart.body.data, 'base64').toString(),
+          content: Buffer.from(
+            htmlPart.body.data.replace(/-/g, '+').replace(/_/g, '/'),
+            'base64'
+          ).toString(),
           isHTML: true
         }
       }
 
       if (plainPart) {
         return {
-          content: Buffer.from(plainPart.body.data, 'base64').toString(),
+          content: Buffer.from(
+            plainPart.body.data.replace(/-/g, '+').replace(/_/g, '/'),
+            'base64'
+          ).toString(),
           isHTML: false
         }
       }
     }
     if (message?.payload?.body?.data) {
       return {
-        content: Buffer.from(message.payload.body.data, 'base64').toString(),
+        content: Buffer.from(
+          message.payload.body.data.replace(/-/g, '+').replace(/_/g, '/'),
+          'base64'
+        ).toString(),
         isHTML: false
       }
     }

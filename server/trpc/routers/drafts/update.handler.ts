@@ -32,7 +32,7 @@ export const updateDraftHandler = async ({
   if (error !== null) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
-      message: 'Failed to create draft',
+      message: 'Failed to update draft',
       cause: error
     })
   }
