@@ -36,6 +36,10 @@ const { mutate: send, isLoading } = useMutation({
       content: content.value
     })
   },
+  onSuccess() {
+    toast.success('Mail sent')
+    emit('close')
+  },
   onError(err) {
     console.error(err)
     toast.error('Failed to send mail')
