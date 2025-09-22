@@ -10,10 +10,11 @@ const { $trpc } = useNuxtApp()
 
 const windowSize = ref<'normal' | 'minimized' | 'opened-in-full'>('normal')
 
-const to = ref('')
-const subject = ref('')
-const content = ref('')
+const to = ref<string | undefined>(undefined)
+const subject = ref<string>('')
+const content = ref<string>('')
 const draftId = ref<string | null>(null)
+const changedSinceSaved = ref(false)
 
 const minimized = computed({
   get: () => windowSize.value === 'minimized',
@@ -28,15 +29,34 @@ const openedInFull = computed({
   }
 })
 
-const { mutate: send, isLoading } = useMutation({
-  mutation: () => {
+const { mutate: send, isLoading, status: sendStatus } = useMutation({
+  mutation: async () => {
+    if (!to.value) {
+      throw new Error('To is empty')
+    }
+    if (!subject.value.trim() && !content.value.trim() && !confirm('Subject and content are empty. Are you sure you want to send?')) {
+      return false
+    }
+    if (draftId.value) {
+      return $trpc.drafts.send.mutate(
+        {
+          draftId: draftId.value,
+          changedValues: changedSinceSaved.value
+            ? {
+                to: to.value,
+                subject: subject.value,
+                content: content.value
+              }
+            : undefined
+        })
+    }
     return $trpc.mails.send.mutate({
       to: to.value,
       subject: subject.value,
       content: content.value
     })
   },
-  onSuccess() {
+  onSettled() {
     toast.success('Mail sent')
     emit('close')
   },
@@ -62,6 +82,7 @@ const { mutate: save, status: saveStatus, asyncStatus: saveAsyncStatus, reset: r
         }),
   onSuccess(draft) {
     draftId.value = draft.id
+    changedSinceSaved.value = false
   },
   onError(err) {
     console.error(err)
@@ -81,8 +102,8 @@ const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
   if (el instanceof HTMLElement) el.focus()
 }
 
-debouncedWatch([to, subject, content], () => {
-  save()
+const stopAutoSave = debouncedWatch([to, subject, content, isLoading, sendStatus], () => {
+  if (isLoading.value, sendStatus.value !== 'success') save()
 }, {
   debounce: 1600
 })
@@ -94,7 +115,12 @@ debouncedWatch(saveStatus, () => {
 })
 
 onBeforeUnmount(() => {
-  if ((to.value || subject.value || content.value) || saveStatus.value === 'success') save()
+  stopAutoSave()
+  if ((to.value || subject.value || content.value) && saveStatus.value !== 'success') save()
+})
+
+watch([to, subject, content], () => {
+  changedSinceSaved.value = true
 })
 </script>
 

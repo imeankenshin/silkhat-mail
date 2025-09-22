@@ -16,33 +16,63 @@ export class GmailService implements IGmailService {
     return value.replace(/[\r\n]/g, '')
   }
 
+  #encode(message: { to?: string, subject?: string, content?: string }) {
+    const headers = [
+      `Content-Type: text/plain; charset="UTF-8"`,
+      `MIME-Version: 1.0`,
+      `Content-Transfer-Encoding: 7bit`
+    ]
+
+    if (message.to) {
+      headers.push(`to: ${this.#sanitizeHeader(message.to)}`)
+    }
+    if (message.subject) {
+      headers.push(`subject: ${this.#sanitizeHeader(message.subject)}`)
+    }
+
+    const sanitizedContent = message.content
+      ? this.#sanitizeHeader(message.content)
+      : ''
+    const emailContent = [...headers, '', sanitizedContent].join('\n')
+
+    // メールメッセージをBase64エンコード
+    return Buffer.from(emailContent)
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '')
+  }
+
+  sendDraft(
+    accessToken: string,
+    draftId: string,
+    changedValues?: { to?: string, subject?: string, content?: string }
+  ) {
+    return tryCatch(
+      this.#fetchGmailApi(accessToken, `/users/me/drafts/${draftId}/send`, {
+        method: 'POST',
+        body: JSON.stringify({
+          draftId,
+          message: changedValues
+            ? {
+                raw: this.#encode(changedValues)
+              }
+            : undefined
+        })
+      })
+    )
+  }
+
   async sendMessage(
     accessToken: string,
     input: { to: string, subject: string, content: string }
   ): Promise<Result<undefined, Error>> {
     // RFC 2822形式のメールメッセージを作成
-    const emailContent = [
-      `Content-Type: text/plain; charset="UTF-8"`,
-      `MIME-Version: 1.0`,
-      `Content-Transfer-Encoding: 7bit`,
-      `to: ${input.to}`,
-      `subject: ${input.subject}`,
-      ``,
-      `${input.content}`
-    ].join('\n')
-
-    // メールメッセージをBase64エンコード
-    const base64EncodedEmail = Buffer.from(emailContent)
-      .toString('base64')
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '')
-
     const { error: sendError } = await tryCatch(
       this.#fetchGmailApi(accessToken, `/users/me/messages/send`, {
         method: 'POST',
         body: JSON.stringify({
-          raw: base64EncodedEmail
+          raw: this.#encode(input)
         })
       })
     )
@@ -58,35 +88,12 @@ export class GmailService implements IGmailService {
     accessToken: string,
     input: { to?: string, subject?: string, content?: string }
   ) {
-    const headers = [
-      `Content-Type: text/plain; charset="UTF-8"`,
-      `MIME-Version: 1.0`,
-      `Content-Transfer-Encoding: 7bit`
-    ]
-
-    if (input.to) {
-      headers.push(`to: ${this.#sanitizeHeader(input.to)}`)
-    }
-    if (input.subject) {
-      headers.push(`subject: ${this.#sanitizeHeader(input.subject)}`)
-    }
-
-    const sanitizedContent = input.content ? this.#sanitizeHeader(input.content) : ''
-    const emailContent = [...headers, '', sanitizedContent].join('\n')
-
-    // メールメッセージをBase64エンコード
-    const base64EncodedEmail = Buffer.from(emailContent)
-      .toString('base64')
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '')
-
     const { error: createDraftError, data: draft } = await tryCatch(
       this.#fetchGmailApi<GmailDraft>(accessToken, `/users/me/drafts`, {
         method: 'POST',
         body: JSON.stringify({
           message: {
-            raw: base64EncodedEmail
+            raw: this.#encode(input)
           }
         })
       })
@@ -102,34 +109,12 @@ export class GmailService implements IGmailService {
     id: string,
     input: { to?: string, subject?: string, content?: string }
   ) {
-    const headers = [
-      'Content-Type: text/plain; charset="UTF-8"',
-      'MIME-Version: 1.0',
-      'Content-Transfer-Encoding: 7bit'
-    ]
-
-    if (input.to) {
-      headers.push(`to: ${this.#sanitizeHeader(input.to)}`)
-    }
-    if (input.subject) {
-      headers.push(`subject: ${this.#sanitizeHeader(input.subject)}`)
-    }
-
-    const sanitizedContent = input.content ? this.#sanitizeHeader(input.content) : ''
-    const emailContent = [...headers, '', sanitizedContent].join('\n')
-    // メールメッセージをBase64エンコード
-    const base64EncodedEmail = Buffer.from(emailContent)
-      .toString('base64')
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '')
-
     const { error: createDraftError, data: draft } = await tryCatch(
       this.#fetchGmailApi<GmailDraft>(accessToken, `/users/me/drafts/${id}`, {
         method: 'PUT',
         body: JSON.stringify({
           message: {
-            raw: base64EncodedEmail
+            raw: this.#encode(input)
           }
         })
       })

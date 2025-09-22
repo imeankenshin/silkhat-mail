@@ -5,6 +5,8 @@ import { VCreateDraftInputSchema } from './create.schema'
 import { createDraftHandler } from './create.handler'
 import { updateDraftHandler } from './update.handler'
 import { VUpdateDraftInputSchema } from './update.schema'
+import { VSendDraftInputSchema } from './send.schema'
+import { sendDraftHandler } from './send.handler'
 
 export const draftRoutes = createTRPCRouter({
   create: googleAuthedProcedure
@@ -12,5 +14,8 @@ export const draftRoutes = createTRPCRouter({
     .mutation(({ input }) => createDraftHandler({ input })),
   update: googleAuthedProcedure
     .input(v => parse(VUpdateDraftInputSchema, v))
-    .mutation(({ input }) => updateDraftHandler({ input }))
+    .mutation(({ input }) => updateDraftHandler({ input })),
+  send: googleAuthedProcedure
+    .input(v => parse(VSendDraftInputSchema, v))
+    .mutation(({ input }) => sendDraftHandler({ input }))
 })
