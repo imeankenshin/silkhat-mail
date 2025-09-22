@@ -10,7 +10,8 @@ export default defineNuxtConfig({
     'shadcn-nuxt',
     '@nuxtjs/color-mode',
     '@nuxt/icon',
-    '@sentry/nuxt/module'
+    '@sentry/nuxt/module',
+    'motion-v/nuxt'
   ],
 
   devtools: {

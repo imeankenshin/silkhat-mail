@@ -9,6 +9,123 @@ const formattableFromPatterns = [
 
 export class GmailService implements IGmailService {
   /**
+   * Sanitize header values to prevent header injection
+   * Removes CR/LF characters
+   */
+  #sanitizeHeader(value: string): string {
+    return value.replace(/[\r\n]/g, '')
+  }
+
+  #encode(message: { to?: string, subject?: string, content?: string }) {
+    const headers = [
+      `Content-Type: text/plain; charset="UTF-8"`,
+      `MIME-Version: 1.0`,
+      `Content-Transfer-Encoding: 7bit`
+    ]
+
+    if (message.to) {
+      headers.push(`to: ${this.#sanitizeHeader(message.to)}`)
+    }
+    if (message.subject) {
+      headers.push(`subject: ${this.#sanitizeHeader(message.subject)}`)
+    }
+
+    const sanitizedContent = message.content
+      ? this.#sanitizeHeader(message.content)
+      : ''
+    const emailContent = [...headers, '', sanitizedContent].join('\n')
+
+    // メールメッセージをBase64エンコード
+    return Buffer.from(emailContent)
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '')
+  }
+
+  sendDraft(
+    accessToken: string,
+    draftId: string,
+    changedValues?: { to?: string, subject?: string, content?: string }
+  ) {
+    return tryCatch(
+      this.#fetchGmailApi(accessToken, `/users/me/drafts/${draftId}/send`, {
+        method: 'POST',
+        body: JSON.stringify({
+          draftId,
+          message: changedValues
+            ? {
+                raw: this.#encode(changedValues)
+              }
+            : undefined
+        })
+      })
+    )
+  }
+
+  async sendMessage(
+    accessToken: string,
+    input: { to: string, subject: string, content: string }
+  ): Promise<Result<undefined, Error>> {
+    // RFC 2822形式のメールメッセージを作成
+    const { error: sendError } = await tryCatch(
+      this.#fetchGmailApi(accessToken, `/users/me/messages/send`, {
+        method: 'POST',
+        body: JSON.stringify({
+          raw: this.#encode(input)
+        })
+      })
+    )
+
+    if (sendError !== null) {
+      return failure(sendError)
+    }
+
+    return success(undefined)
+  }
+
+  async createDraft(
+    accessToken: string,
+    input: { to?: string, subject?: string, content?: string }
+  ) {
+    const { error: createDraftError, data: draft } = await tryCatch(
+      this.#fetchGmailApi<GmailDraft>(accessToken, `/users/me/drafts`, {
+        method: 'POST',
+        body: JSON.stringify({
+          message: {
+            raw: this.#encode(input)
+          }
+        })
+      })
+    )
+    if (createDraftError !== null) {
+      return failure(createDraftError)
+    }
+    return success(draft)
+  }
+
+  async updateDraft(
+    accessToken: string,
+    id: string,
+    input: { to?: string, subject?: string, content?: string }
+  ) {
+    const { error: createDraftError, data: draft } = await tryCatch(
+      this.#fetchGmailApi<GmailDraft>(accessToken, `/users/me/drafts/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          message: {
+            raw: this.#encode(input)
+          }
+        })
+      })
+    )
+    if (createDraftError !== null) {
+      return failure(createDraftError)
+    }
+    return success(draft)
+  }
+
+  /**
    * Gmail APIと通信するための汎用fetchラッパー
    */
   async #fetchGmailApi<T>(
@@ -195,15 +312,33 @@ export class GmailService implements IGmailService {
       const plainPart = parts.find(p => p.mimeType === 'text/plain')
 
       if (htmlPart) {
-        return { content: Buffer.from(htmlPart.body.data, 'base64').toString(), isHTML: true }
+        return {
+          content: Buffer.from(
+            htmlPart.body.data.replace(/-/g, '+').replace(/_/g, '/'),
+            'base64'
+          ).toString(),
+          isHTML: true
+        }
       }
 
       if (plainPart) {
-        return { content: Buffer.from(plainPart.body.data, 'base64').toString(), isHTML: false }
+        return {
+          content: Buffer.from(
+            plainPart.body.data.replace(/-/g, '+').replace(/_/g, '/'),
+            'base64'
+          ).toString(),
+          isHTML: false
+        }
       }
     }
     if (message?.payload?.body?.data) {
-      return { content: Buffer.from(message.payload.body.data, 'base64').toString(), isHTML: false }
+      return {
+        content: Buffer.from(
+          message.payload.body.data.replace(/-/g, '+').replace(/_/g, '/'),
+          'base64'
+        ).toString(),
+        isHTML: false
+      }
     }
     return { content: '', isHTML: false }
   }
