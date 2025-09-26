@@ -12,7 +12,7 @@ const commonSidebarGroup = [
   {
     name: 'Inbox',
     icon: 'material-symbols:inbox-rounded',
-    to: '/'
+    to: '/mails'
   },
   {
     name: 'Starred',
