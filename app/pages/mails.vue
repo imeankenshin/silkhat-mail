@@ -20,6 +20,7 @@ const { data: mail } = useQuery({
     return await $trpc.mails.get.query({ id: params.mailId })
   }
 })
+
 const { data: mails } = useQuery({
   key: () => ['mails', { is: params.is }],
   query: () => $trpc.mails.list.query(params.is ? { q: `is:${params.is}` } : {})
