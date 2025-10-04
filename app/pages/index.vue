@@ -19,7 +19,7 @@ definePageMeta({
         Organize your mail with total joy!
       </h1>
       <p class="text-lg">
-        Yea, the preview right blow looks hella not fun... but guess what? IT’S FREE TO USE!!!
+        Silk Hat Mail is a web-based email client that helps you manage your email efficiently. It's FREE to use!
       </p>
       <UiButton
         size="lg"
