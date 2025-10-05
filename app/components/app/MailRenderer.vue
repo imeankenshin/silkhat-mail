@@ -3,9 +3,20 @@ const props = defineProps<{
   mail: FullMail
 }>()
 
+const escapeHtml = (value: string) =>
+  value
+    .replaceAll(/&/g, '&amp;')
+    .replaceAll(/</g, '&lt;')
+    .replaceAll(/>/g, '&gt;')
+    .replaceAll(/"/g, '&quot;')
+    .replaceAll(/'/g, '&#39;')
+
 const mailContent = computed(() => {
-  if (!props.mail.isHTML)
-    return props.mail?.content.replaceAll('\n', '<br>') ?? ''
+  if (!props.mail.isHTML) {
+    const content = props.mail?.content ?? ''
+    const escaped = escapeHtml(content)
+    return escaped.replaceAll('\n', '<br>')
+  }
   const document = new DOMParser().parseFromString(props.mail.content, 'text/html')
   const style = Array.from(document.querySelectorAll('style')).map(s => `<style>${s.innerText.replaceAll(/body|html/g, ':host')}</style>`).join('')
   document.querySelectorAll<HTMLElement>('*').forEach((el) => {
@@ -16,18 +27,31 @@ const mailContent = computed(() => {
     }
   })
   document.querySelectorAll('script').forEach(s => s.remove())
-  document.querySelectorAll('a').forEach(a => a.target = '_blank')
+  document.querySelectorAll('a').forEach((a) => {
+    a.target = '_blank'
+    a.rel = 'noopener noreferrer'
+  })
   return `${style}${document.body.innerHTML}`
 })
 </script>
 
 <template>
-  <UiShadowRoot class="h-max px-4">
+  <div>
+    <UiShadowRoot
+      v-if="mail.isHTML"
+      class="h-max px-4"
+    >
+      <div
+        :style="{
+          display: 'contents'
+        }"
+        v-html="mailContent"
+      />
+    </UiShadowRoot>
     <div
-      :style="{
-        display: 'contents'
-      }"
+      v-else
+      class="h-max px-4"
       v-html="mailContent"
     />
-  </UiShadowRoot>
+  </div>
 </template>
