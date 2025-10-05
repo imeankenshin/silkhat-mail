@@ -3,8 +3,8 @@
     <AppSidebar />
     <main class="w-full min-w-0">
       <div class="z-10 p-1 sticky inset-0 flex">
-        <div class="p-2 bg-background/30 backdrop-blur rounded-lg">
-          <UiSidebarTrigger />
+        <div class="absolute inset-5">
+          <AppSidebarTrigger show-on="closed" />
         </div>
       </div>
       <slot />

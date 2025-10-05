@@ -39,13 +39,14 @@ const commonSidebarGroup = [
 
 <template>
   <UiSidebar>
-    <UiSidebarHeader class="py-4 flex justify-between">
+    <UiSidebarHeader class="py-4 flex flex-row justify-between">
       <UiButton
         size="icon"
         variant="ghost"
         icon="material-symbols:edit-rounded"
         @click="createDraft()"
       />
+      <AppSidebarTrigger show-on="open" />
     </UiSidebarHeader>
     <UiSidebarContent>
       <UiSidebarGroup>
