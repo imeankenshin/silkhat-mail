@@ -337,7 +337,7 @@ export class GmailService implements IGmailService {
           message.payload.body.data.replace(/-/g, '+').replace(/_/g, '/'),
           'base64'
         ).toString(),
-        isHTML: false
+        isHTML: message.payload.mimeType === 'text/html'
       }
     }
     return { content: '', isHTML: false }
