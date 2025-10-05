@@ -14,6 +14,8 @@ interface GmailMessagePayload {
   headers?: GmailMessageHeader[]
   body?: GmailMessageBody
   parts?: GmailMessagePart[]
+  mimeType: string
+  partId: string
 }
 
 interface GmailMessagePart {
