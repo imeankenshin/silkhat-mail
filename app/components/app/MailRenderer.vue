@@ -15,6 +15,21 @@ const mailContent = computed(() => {
   if (!props.mail.isHTML) {
     const content = props.mail?.content ?? ''
     const escaped = escapeHtml(content)
+    // URLをリンクに変換（簡単な正規表現）
+      .replaceAll(
+        /(https?:\/\/[^\s]+)/g,
+        '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+      )
+      // メールアドレスをリンクに変換
+      .replaceAll(
+        /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
+        '<a href="mailto:$1">$1</a>'
+      )
+      // 電話番号をリンクに変換
+      .replaceAll(
+        /([0-9]{3}-[0-9]{3}-[0-9]{4})/g,
+        '<a href="tel:$1">$1</a>'
+      )
     return escaped.replaceAll('\n', '<br>')
   }
   const document = new DOMParser().parseFromString(props.mail.content, 'text/html')
