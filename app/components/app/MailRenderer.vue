@@ -16,6 +16,12 @@ const escapeHtmlAttribute = (value: string) =>
 
 const LINK_PLACEHOLDER_PREFIX = '__MAIL_RENDERER_LINK__'
 
+const rewriteRootSelectors = (css: string) =>
+  css.replace(
+    /(^|[\s,{>+~])(html|body)(?=(?:[\s.{:#,[>+~]|$))/g,
+    (_, prefix) => `${prefix}:host`
+  )
+
 const buildPlainTextHtml = (raw: string) => {
   let counter = 0
   const replacements = new Map<string, string>()
@@ -52,7 +58,11 @@ const mailContent = computed(() => {
   if (!props.mail.isHTML)
     return buildPlainTextHtml(props.mail?.content ?? '')
   const document = new DOMParser().parseFromString(props.mail.content, 'text/html')
-  const style = Array.from(document.querySelectorAll('style')).map(s => `<style>${s.innerText.replaceAll(/body|html/g, ':host')}</style>`).join('')
+
+  const style = Array
+    .from(document.querySelectorAll('style'))
+    .map(s => `<style>${rewriteRootSelectors(s.textContent ?? '')}</style>`)
+    .join('')
   // TODO: Implement dark reader.
   document.querySelectorAll('script').forEach(s => s.remove())
   document.querySelectorAll('a').forEach((a) => {
