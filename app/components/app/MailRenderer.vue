@@ -11,6 +11,9 @@ const escapeHtml = (value: string) =>
     .replaceAll(/"/g, '&quot;')
     .replaceAll(/'/g, '&#39;')
 
+const escapeHtmlAttribute = (value: string) =>
+  value.replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+
 const LINK_PLACEHOLDER_PREFIX = '__MAIL_RENDERER_LINK__'
 
 const buildPlainTextHtml = (raw: string) => {
@@ -20,11 +23,11 @@ const buildPlainTextHtml = (raw: string) => {
     [
       /(https?:\/\/[^\s]+)/g,
       match =>
-        `<a href="${encodeURI(match)}" target="_blank" rel="noopener noreferrer">${escapeHtml(match)}</a>`
+        `<a href="${escapeHtmlAttribute(encodeURI(match))}" target="_blank" rel="noopener noreferrer">${escapeHtml(match)}</a>`
     ],
     [
       /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
-      match => `<a href="mailto:${encodeURI(match)}">${escapeHtml(match)}</a>`
+      match => `<a href="mailto:${escapeHtmlAttribute(encodeURI(match))}">${escapeHtml(match)}</a>`
     ],
     [
       /\b([0-9]{3}-[0-9]{3}-[0-9]{4})\b/g,
