@@ -11,27 +11,43 @@ const escapeHtml = (value: string) =>
     .replaceAll(/"/g, '&quot;')
     .replaceAll(/'/g, '&#39;')
 
+const LINK_PLACEHOLDER_PREFIX = '__MAIL_RENDERER_LINK__'
+
+const buildPlainTextHtml = (raw: string) => {
+  let counter = 0
+  const replacements = new Map<string, string>()
+  const patterns: Array<[RegExp, (match: string) => string]> = [
+    [
+      /(https?:\/\/[^\s]+)/g,
+      match =>
+        `<a href="${encodeURI(match)}" target="_blank" rel="noopener noreferrer">${escapeHtml(match)}</a>`
+    ],
+    [
+      /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
+      match => `<a href="mailto:${encodeURI(match)}">${escapeHtml(match)}</a>`
+    ],
+    [
+      /\b([0-9]{3}-[0-9]{3}-[0-9]{4})\b/g,
+      match => `<a href="tel:${match.replace(/\D/g, '')}">${escapeHtml(match)}</a>`
+    ]
+  ]
+
+  const withPlaceholders = patterns.reduce((acc, [regex, build]) => acc.replace(regex, (value) => {
+    const placeholder = `${LINK_PLACEHOLDER_PREFIX}${counter++}__`
+    replacements.set(placeholder, build(value))
+    return placeholder
+  }), raw)
+
+  let escaped = escapeHtml(withPlaceholders).replace(/\r?\n/g, '<br>')
+  replacements.forEach((html, placeholder) => {
+    escaped = escaped.replaceAll(placeholder, html)
+  })
+  return escaped
+}
+
 const mailContent = computed(() => {
-  if (!props.mail.isHTML) {
-    const content = props.mail?.content ?? ''
-    const escaped = escapeHtml(content)
-    // URLをリンクに変換（簡単な正規表現）
-      .replaceAll(
-        /(https?:\/\/[^\s]+)/g,
-        '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
-      )
-      // メールアドレスをリンクに変換
-      .replaceAll(
-        /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
-        '<a href="mailto:$1">$1</a>'
-      )
-      // 電話番号をリンクに変換
-      .replaceAll(
-        /([0-9]{3}-[0-9]{3}-[0-9]{4})/g,
-        '<a href="tel:$1">$1</a>'
-      )
-    return escaped.replaceAll('\n', '<br>')
-  }
+  if (!props.mail.isHTML)
+    return buildPlainTextHtml(props.mail?.content ?? '')
   const document = new DOMParser().parseFromString(props.mail.content, 'text/html')
   const style = Array.from(document.querySelectorAll('style')).map(s => `<style>${s.innerText.replaceAll(/body|html/g, ':host')}</style>`).join('')
   document.querySelectorAll<HTMLElement>('*').forEach((el) => {
