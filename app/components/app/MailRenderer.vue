@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import DOMPurify from 'dompurify'
+
 const props = defineProps<{
   mail: FullMail
 }>()
@@ -57,7 +59,8 @@ const buildPlainTextHtml = (raw: string) => {
 const mailContent = computed(() => {
   if (!props.mail.isHTML)
     return buildPlainTextHtml(props.mail?.content ?? '')
-  const document = new DOMParser().parseFromString(props.mail.content, 'text/html')
+  const sanitized = DOMPurify.sanitize(props.mail.content)
+  const document = new DOMParser().parseFromString(sanitized, 'text/html')
 
   const style = Array
     .from(document.querySelectorAll('style'))
