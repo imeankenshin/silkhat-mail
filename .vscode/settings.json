@@ -10,10 +10,11 @@
     "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock"
   },
   "cSpell.words": [
+    "dompurify",
     "reka",
     "sonner",
     "Unstarred",
     "valibot",
     "vueuse"
-  ]
+  ],
 }

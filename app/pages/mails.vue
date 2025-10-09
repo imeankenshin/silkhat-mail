@@ -30,16 +30,6 @@ const firstMailEl = computed(() => {
   const first = mailListEl.value?.children[0]
   return first instanceof HTMLElement ? first : null
 })
-const mailContent = computed(() => {
-  if (!mail.value) return null
-  if (!mail.value?.isHTML)
-    return mail.value?.content ?? ''
-  const document = new DOMParser().parseFromString(mail.value.content, 'text/html')
-  const style = Array.from(document.querySelectorAll('style')).map(s => s.innerText).join().replaceAll(/body|html/g, ':host')
-  document.querySelectorAll('script').forEach(s => s.remove())
-  document.querySelectorAll('a').forEach(a => a.target = '_blank')
-  return `${style && `<style>${style}</style>`}${document.body.innerHTML}`
-})
 
 const debounceToggleStar = useDebounceFn(async (mail: Mail) => {
   return $trpc.mails.toggleStar.mutate({ id: mail.id, value: !isStarred(mail) })
@@ -144,15 +134,10 @@ watchEffect(() => {
               class="h-7"
             />
           </UiSheetHeader>
-          <UiShadowRoot
-            v-if="mailContent"
-            class="h-max px-4"
-          >
-            <div
-              style="display: contents;"
-              v-html="mailContent"
-            />
-          </UiShadowRoot>
+          <AppMailRenderer
+            v-if="mail"
+            :mail
+          />
           <UiSkeleton v-else />
         </div>
       </UiSheetContent>
