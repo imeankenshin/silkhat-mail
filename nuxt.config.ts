@@ -69,6 +69,10 @@ export default defineNuxtConfig({
     }
   },
 
+  hub: {
+    workers: true
+  },
+
   vite: {
     plugins: [tailwindcss(), unctxPlugin.vite({})]
   },
