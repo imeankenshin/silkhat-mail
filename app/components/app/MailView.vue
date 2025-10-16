@@ -3,17 +3,17 @@ const { $trpc } = useNuxtApp()
 const selectedMail = useSelectedMailStore()
 
 const { data: mail } = useQuery({
-  key: () => ['mail', selectedMail.mail?.id || 'null'],
+  key: () => ['mail', selectedMail.mailId || 'null'],
   query: async () => {
-    if (!selectedMail.mail?.id) return null
-    return await $trpc.mails.get.query({ id: selectedMail.mail?.id })
+    if (!selectedMail.mailId) return null
+    return await $trpc.mails.get.query({ id: selectedMail.mailId })
   }
 })
 </script>
 
 <template>
   <UiSheet
-    :open="!!selectedMail.mail"
+    :open="!!selectedMail.mailId"
     @update:open="selectedMail.unselect()"
   >
     <UiSheetContent class="sm:max-w-2xl overflow-y-auto outline-none">
