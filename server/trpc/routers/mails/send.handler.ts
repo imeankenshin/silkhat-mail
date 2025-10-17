@@ -1,14 +1,13 @@
 import { TRPCError } from '@trpc/server'
 import { useGoogleAccessToken } from '../../context/session'
 import type { TSendMailInputSchema } from './send.schema'
-import { GmailService } from '~~/server/services/gmail/gmail.service'
+import * as gmailService from '~~/server/services/gmail'
 
 type SendMailOptions = {
   input: TSendMailInputSchema
 }
 
 export const sendHandler = async ({ input }: SendMailOptions) => {
-  const gmailService = new GmailService()
   const accessToken = useGoogleAccessToken()
 
   if (accessToken === null) {

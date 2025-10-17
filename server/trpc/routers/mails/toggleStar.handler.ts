@@ -1,14 +1,13 @@
 import { TRPCError } from '@trpc/server'
 import type { TToggleStarInputSchema } from './toggleStar.schema'
 import { useGoogleAccessToken } from '~~/server/trpc/context/session'
-import { GmailService } from '~~/server/services/gmail/gmail.service'
+import * as gmailService from '~~/server/services/gmail'
 
 type ToggleStarOptions = {
   input: TToggleStarInputSchema
 }
 
 export async function toggleStarHandler({ input }: ToggleStarOptions) {
-  const gmailService = new GmailService()
   const accessToken = useGoogleAccessToken()
 
   // Gmail APIを使用してメッセージを取得

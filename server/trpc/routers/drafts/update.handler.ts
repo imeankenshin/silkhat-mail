@@ -1,17 +1,15 @@
 import { TRPCError } from '@trpc/server'
 import { useGoogleAccessToken } from '../../context/session'
 import type { TUpdateDraftInputSchema } from './update.schema'
-import { GmailService } from '~~/server/services/gmail/gmail.service'
+import * as gmailService from '~~/server/services/gmail'
 
 type UpdateDraftOptions = {
   input: TUpdateDraftInputSchema
 }
 
-export const updateDraftHandler = async ({
-  input
-}: UpdateDraftOptions) => {
+export const updateDraftHandler = async ({ input }: UpdateDraftOptions) => {
   // TODO: Gmail APIを使用してドラフトを作成
-  const gmailService = new GmailService()
+
   const accessToken = useGoogleAccessToken()
 
   if (accessToken === null) {

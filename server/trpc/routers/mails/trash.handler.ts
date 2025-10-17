@@ -1,14 +1,13 @@
 import { TRPCError } from '@trpc/server'
 import type { TTrashMailInputSchema } from './trash.schema'
 import { useGoogleAccessToken } from '~~/server/trpc/context/session'
-import { GmailService } from '~~/server/services/gmail/gmail.service'
+import * as gmailService from '~~/server/services/gmail'
 
 type TrashMailOptions = {
   input: TTrashMailInputSchema
 }
 
 export async function trashMailHandler({ input }: TrashMailOptions) {
-  const gmailService = new GmailService()
   const accessToken = useGoogleAccessToken()
   // Gmail APIを使用してメッセージを取得
   const { data: messages, error } = await gmailService.trash(accessToken, input.id)
