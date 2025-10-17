@@ -1,14 +1,13 @@
 import { TRPCError } from '@trpc/server'
 import type { TGetMailsInputSchema } from './get.schema'
 import { useGoogleAccessToken } from '~~/server/trpc/context/session'
-import { GmailService } from '~~/server/services/gmail/gmail.service'
+import * as gmailService from '~~/server/services/gmail'
 
 type getMailOptions = {
   input: TGetMailsInputSchema
 }
 
 export async function getHandler({ input }: getMailOptions) {
-  const gmailService = new GmailService()
   const accessToken = useGoogleAccessToken()
 
   // Gmail APIを使用してメッセージを取得

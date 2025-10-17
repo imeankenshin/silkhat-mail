@@ -1,14 +1,13 @@
 import { TRPCError } from '@trpc/server'
 import type { TArchiveMailInputSchema } from './archive.schema'
 import { useGoogleAccessToken } from '~~/server/trpc/context/session'
-import { GmailService } from '~~/server/services/gmail/gmail.service'
+import * as gmailService from '~~/server/services/gmail'
 
 type ArchiveMailOptions = {
   input: TArchiveMailInputSchema
 }
 
 export async function archiveMailHandler({ input }: ArchiveMailOptions) {
-  const gmailService = new GmailService()
   const accessToken = useGoogleAccessToken()
 
   if (accessToken === null) {
