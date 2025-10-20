@@ -7,8 +7,8 @@ const emit = defineEmits<{
   (e: 'toggle-star' | 'archive' | 'trash'): void
 }>()
 
-const selectedMail = useSelectedMailStore()
-const isSelected = computed(() => selectedMail.mailId === props.mail.id)
+const { mailId, select } = useSelectedMail()
+const isSelected = computed(() => mailId.value === props.mail.id)
 </script>
 
 <template>
@@ -20,8 +20,8 @@ const isSelected = computed(() => selectedMail.mailId === props.mail.id)
     :aria-label="`Email from ${mail.from}: ${mail.subject}`"
     tabindex="-1"
     class="w-full flex outline-none items-center gap-4 p-4 hover:bg-muted/50 focus:bg-muted/50 cursor-pointer"
-    @click="selectedMail.select(mail.id)"
-    @keydown.enter.space.prevent="selectedMail.select(mail.id)"
+    @click="select(mail.id)"
+    @keydown.enter.space.prevent="select(mail.id)"
     @keydown.s.prevent="emit('toggle-star')"
     @keydown.a.prevent="emit('archive')"
     @keydown.d.prevent="emit('trash')"

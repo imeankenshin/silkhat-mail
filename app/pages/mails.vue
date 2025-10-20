@@ -7,7 +7,7 @@ definePageMeta({
 })
 // サンプルメールデータ
 const { $trpc } = useNuxtApp()
-const selectedMail = useSelectedMailStore()
+const { mailId } = useSelectedMail()
 const mailListEl = useTemplateRef('mail-list')
 const route = useRoute()
 const params = useUrlSearchParams<{
@@ -58,7 +58,7 @@ const { mutate: trash } = useMailMutation(
 )
 
 useEventListener('keydown', (e) => {
-  if (selectedMail.mail || e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+  if (mailId.value || e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
   switch (e.key) {
     case 'k':
     case 'ArrowUp': {
