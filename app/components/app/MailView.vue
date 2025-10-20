@@ -9,8 +9,6 @@ const { data: mail } = useQuery({
     return await $trpc.mails.get.query({ id: mailId.value })
   }
 })
-
-watchEffect(() => console.log(mailId.value))
 </script>
 
 <template>
