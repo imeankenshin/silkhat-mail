@@ -1,8 +1,8 @@
-import * as v from 'valibot'
+import { type } from 'arktype'
 
-export const VToggleStarInputSchema = v.object({
-  id: v.pipe(v.string(), v.minLength(1)),
-  value: v.boolean()
+export const AToggleStarInputSchema = type({
+  id: 'string > 0',
+  value: 'boolean'
 })
 
-export type TToggleStarInputSchema = v.InferOutput<typeof VToggleStarInputSchema>
+export type TToggleStarInputSchema = typeof AToggleStarInputSchema.infer

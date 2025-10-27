@@ -10,6 +10,7 @@
     "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock"
   },
   "cSpell.words": [
+    "arktype",
     "dompurify",
     "reka",
     "sonner",
@@ -17,4 +18,15 @@
     "valibot",
     "vueuse"
   ],
+  "java.jdt.ls.java.home": "/Users/kenshinomura/.local/share/mise/installs/java/corretto-21.0.8.9.1",
+  "java.import.gradle.java.home": "/Users/kenshinomura/.local/share/mise/installs/java/corretto-21.0.8.9.1",
+  "go.goroot": "/Users/kenshinomura/.local/share/mise/installs/go/1.25.1",
+  "debug.javascript.defaultRuntimeExecutable": {
+    "pwa-node": "/Users/kenshinomura/.local/share/mise/shims/node"
+  },
+  "zig.path": "/Users/kenshinomura/.local/share/mise/installs/zig/0.15.1/bin/zig",
+  "go.alternateTools": {
+    "go": "/Users/kenshinomura/.local/share/mise/shims/go",
+    "gopls": "/Users/kenshinomura/.local/share/mise/shims/gopls"
+  },
 }

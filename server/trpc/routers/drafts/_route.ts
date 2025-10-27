@@ -1,21 +1,20 @@
-import { parse } from 'valibot'
 import { createTRPCRouter } from '../../init'
 import { googleAuthedProcedure } from '../../procedures/authed-procedure'
-import { VCreateDraftInputSchema } from './create.schema'
+import { ACreateDraftInputSchema } from './create.schema'
 import { createDraftHandler } from './create.handler'
 import { updateDraftHandler } from './update.handler'
-import { VUpdateDraftInputSchema } from './update.schema'
-import { VSendDraftInputSchema } from './send.schema'
+import { AUpdateDraftInputSchema } from './update.schema'
+import { ASendDraftInputSchema } from './send.schema'
 import { sendDraftHandler } from './send.handler'
 
 export const draftRoutes = createTRPCRouter({
   create: googleAuthedProcedure
-    .input(v => parse(VCreateDraftInputSchema, v))
+    .input(ACreateDraftInputSchema)
     .mutation(({ input }) => createDraftHandler({ input })),
   update: googleAuthedProcedure
-    .input(v => parse(VUpdateDraftInputSchema, v))
+    .input(AUpdateDraftInputSchema)
     .mutation(({ input }) => updateDraftHandler({ input })),
   send: googleAuthedProcedure
-    .input(v => parse(VSendDraftInputSchema, v))
+    .input(ASendDraftInputSchema)
     .mutation(({ input }) => sendDraftHandler({ input }))
 })

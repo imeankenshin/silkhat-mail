@@ -1,7 +1,7 @@
-import * as v from 'valibot'
+import { type } from 'arktype'
 
-export const VTrashMailInputSchema = v.object({
-  id: v.pipe(v.string(), v.minLength(1))
+export const ATrashMailInputSchema = type({
+  id: 'string > 0'
 })
 
-export type TTrashMailInputSchema = v.InferOutput<typeof VTrashMailInputSchema>
+export type TTrashMailInputSchema = typeof ATrashMailInputSchema.infer

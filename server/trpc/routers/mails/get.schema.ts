@@ -1,7 +1,7 @@
-import * as v from 'valibot'
+import { type } from 'arktype'
 
-export const VGetMailsInputSchema = v.object({
-  id: v.string()
+export const AGetMailsInputSchema = type({
+  id: 'string > 0'
 })
 
-export type TGetMailsInputSchema = v.InferOutput<typeof VGetMailsInputSchema>
+export type TGetMailsInputSchema = typeof AGetMailsInputSchema.infer
