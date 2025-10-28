@@ -19,7 +19,7 @@ const isSelected = computed(() => mailId.value === props.mail.id)
     :aria-selected="isSelected"
     :aria-label="`Email from ${mail.from}: ${mail.subject}`"
     tabindex="-1"
-    class="w-full group flex gap-4 outline-none items-center p-4 hover:bg-muted/50 focus:bg-muted/50 cursor-pointer"
+    class="w-full group flex gap-3 outline-none items-center px-8 h-16 hover:bg-muted/50 focus:bg-muted/50 cursor-pointer"
     @click="select(mail.id)"
     @keydown.enter.space.prevent="select(mail.id)"
     @keydown.s.prevent="emit('toggle-star')"
@@ -48,7 +48,7 @@ const isSelected = computed(() => mailId.value === props.mail.id)
     />
 
     <!-- メール情報 -->
-    <span class="font-medium text-sm text-foreground truncate text-unwrap w-44 shrink-0">
+    <span class="font-medium text-sm text-foreground truncate text-unwrap w-44 shrink-0 ml-3">
       {{ mail.from }}
     </span>
     <div class="flex w-full gap-2 min-w-0">
