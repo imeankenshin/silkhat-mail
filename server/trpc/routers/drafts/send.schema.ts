@@ -1,14 +1,12 @@
-import * as v from 'valibot'
+import { type } from 'arktype'
 
-export const VSendDraftInputSchema = v.pipe(
-  v.object({
-    draftId: v.string(),
-    changedValues: v.optional(v.object({
-      to: v.optional(v.pipe(v.string(), v.email())),
-      subject: v.optional(v.pipe(v.string())),
-      content: v.optional(v.string())
-    }))
+export const ASendDraftInputSchema = type({
+  'draftId': 'string',
+  'changedValues?': type({
+    'to?': 'string.email',
+    'subject?': 'string',
+    'content?': 'string'
   })
-)
+})
 
-export type TSendDraftInputSchema = v.InferOutput<typeof VSendDraftInputSchema>
+export type TSendDraftInputSchema = typeof ASendDraftInputSchema.infer

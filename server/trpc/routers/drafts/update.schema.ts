@@ -1,14 +1,10 @@
-import * as v from 'valibot'
+import { type } from 'arktype'
 
-export const VUpdateDraftInputSchema = v.pipe(
-  v.object({
-    draftId: v.string(),
-    to: v.optional(v.pipe(v.string(), v.email())),
-    subject: v.optional(v.string()),
-    content: v.optional(v.string())
-  })
-)
+export const AUpdateDraftInputSchema = type({
+  'draftId': 'string',
+  'to?': 'string.email',
+  'subject?': 'string',
+  'content?': 'string'
+})
 
-export type TUpdateDraftInputSchema = v.InferOutput<
-  typeof VUpdateDraftInputSchema
->
+export type TUpdateDraftInputSchema = typeof AUpdateDraftInputSchema.infer

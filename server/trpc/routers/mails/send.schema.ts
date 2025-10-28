@@ -1,9 +1,9 @@
-import * as v from 'valibot'
+import { type } from 'arktype'
 
-export const VSendMailInputSchema = v.object({
-  to: v.pipe(v.string(), v.trim(), v.nonEmpty(), v.email()),
-  subject: v.string(),
-  content: v.string()
+export const ASendMailInputSchema = type({
+  to: 'string.email',
+  subject: 'string',
+  content: 'string'
 })
 
-export type TSendMailInputSchema = v.InferOutput<typeof VSendMailInputSchema>
+export type TSendMailInputSchema = typeof ASendMailInputSchema.infer

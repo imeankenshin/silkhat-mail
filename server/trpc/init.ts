@@ -1,6 +1,6 @@
 import { initTRPC } from '@trpc/server'
 import superjson from 'superjson'
-import { isValiError } from 'valibot'
+import { ArkError } from 'arktype'
 
 // Avoid exporting the entire t-object
 // since it's not very descriptive.
@@ -12,13 +12,12 @@ const t = initTRPC.create({
   */
   transformer: superjson,
   errorFormatter: ({ error, shape }) => {
-    // Valibot のバリデーションエラーを処理
-    if (isValiError(error.cause)) {
+    if (error.cause instanceof ArkError) {
       return {
         ...shape,
         data: {
           ...shape.data,
-          issues: error.cause.issues.flat()
+          issues: error.cause.flat
         }
       }
     }
