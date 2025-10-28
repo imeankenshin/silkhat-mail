@@ -1,9 +1,7 @@
-const GMAIL_API_BASE_URL = 'https://gmail.googleapis.com/gmail/v1'
+import { regex } from 'arktype'
 
-const formattableFromPatterns = [
-  /^"([^"]+)" <([^>]+)>$/,
-  /^([^<]+) <([^>]+)>$/
-] as const
+const GMAIL_API_BASE_URL = 'https://gmail.googleapis.com/gmail/v1'
+const FORMATTABLE_FROM_PATTERN = regex('^"?([^"]+?)"? <([^>]+)>$')
 
 export type GetMessagesOptions = {
   maxResults?: number
@@ -317,10 +315,8 @@ function formatFullMessage(message: GmailMessage): FullMail {
 
 function formatFrom(from: string | null) {
   if (!from) return null
-  for (const pattern of formattableFromPatterns) {
-    const match = from.match(pattern)
-    if (match) return match[1]
-  }
+  const match = FORMATTABLE_FROM_PATTERN.exec(from)
+  if (match) return match[1]
   return from
 }
 
