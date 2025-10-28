@@ -19,7 +19,7 @@ const isSelected = computed(() => mailId.value === props.mail.id)
     :aria-selected="isSelected"
     :aria-label="`Email from ${mail.from}: ${mail.subject}`"
     tabindex="-1"
-    class="w-full flex outline-none items-center gap-4 p-4 hover:bg-muted/50 focus:bg-muted/50 cursor-pointer"
+    class="w-full group flex gap-4 outline-none items-center p-4 hover:bg-muted/50 focus:bg-muted/50 cursor-pointer"
     @click="select(mail.id)"
     @keydown.enter.space.prevent="select(mail.id)"
     @keydown.s.prevent="emit('toggle-star')"
@@ -48,18 +48,30 @@ const isSelected = computed(() => mailId.value === props.mail.id)
     />
 
     <!-- メール情報 -->
-    <div class="flex-1 min-w-0">
-      <div class="flex items-center gap-2">
-        <span class="font-medium text-foreground truncate">
-          {{ mail.from }}
-        </span>
-        <span class="text-muted-foreground truncate">
-          {{ mail.subject }}
-        </span>
-      </div>
+    <span class="font-medium text-sm text-foreground truncate text-unwrap w-44 shrink-0">
+      {{ mail.from }}
+    </span>
+    <div class="flex w-full gap-2 min-w-0">
+      <span class="text-sm truncate w-min">
+        {{ mail.subject }}
+      </span>
+      <span class="text-muted-foreground text-sm truncate flex-1">
+        {{ mail.snippet.replaceAll('\u200d', ' ').trim() }}
+      </span>
     </div>
 
-    <div>
+    <div
+      v-if="mail.date"
+      class="group-hover:hidden group-focus:hidden"
+    >
+      <time
+        :datetime="mail.date"
+        class="font-semibold text-sm"
+      >
+        {{ formatDate(mail.date) }}
+      </time>
+    </div>
+    <div class="group-hover:flex group-focus:flex hidden">
       <UiButton
         tabindex="-1"
         variant="ghost"
