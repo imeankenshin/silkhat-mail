@@ -32,7 +32,7 @@ const commonSidebarGroup = [
   {
     name: 'Promotions',
     icon: 'material-symbols:sell',
-    to: '/mails?is=PROMOTION'
+    to: '/mails?is=PROMOTIONS'
   }
 ]
 </script>
