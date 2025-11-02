@@ -41,13 +41,6 @@ const isSelected = computed(() => mailId.value === props.mail.id)
       />
     </UiButton>
 
-    <!-- アバター -->
-    <UiAvatar
-      :alt="mail.from || ''"
-      size="sm"
-      class="h-10 w-10 bg-muted"
-    />
-
     <!-- メール情報 -->
     <span class="font-medium text-sm truncate text-unwrap w-44 shrink-0 ml-3">
       {{ mail.from }}
