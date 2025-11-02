@@ -14,12 +14,13 @@ const isSelected = computed(() => mailId.value === props.mail.id)
 <template>
   <div
     :key="mail.id"
-    :to="`/mails?id=${mail.id}`"
+    :to="`/mails?id=${mail}`"
     role="listitem"
     :aria-selected="isSelected"
     :aria-label="`Email from ${mail.from}: ${mail.subject}`"
+    :data-read="isRead(mail)"
     tabindex="-1"
-    class="w-full group flex gap-3 outline-none items-center px-4 h-16 hover:bg-muted/50 focus:bg-muted/50 cursor-pointer"
+    class="w-full group flex gap-3 outline-none items-center px-4 h-16 hover:bg-muted/50 focus:bg-muted/50 cursor-pointer data-[read=true]:text-muted-foreground"
     @click="select(mail.id)"
     @keydown.enter.space.prevent="select(mail.id)"
     @keydown.s.prevent="emit('toggle-star')"
@@ -48,7 +49,7 @@ const isSelected = computed(() => mailId.value === props.mail.id)
     />
 
     <!-- メール情報 -->
-    <span class="font-medium text-sm text-foreground truncate text-unwrap w-44 shrink-0 ml-3">
+    <span class="font-medium text-sm truncate text-unwrap w-44 shrink-0 ml-3">
       {{ mail.from }}
     </span>
     <div class="flex w-full gap-2 min-w-0">
@@ -62,11 +63,12 @@ const isSelected = computed(() => mailId.value === props.mail.id)
 
     <div
       v-if="mail.date"
-      class="group-hover:hidden group-focus:hidden"
+      class="group-hover:hidden group-focus:hidden mx-2"
     >
       <time
         :datetime="mail.date"
-        class="font-semibold text-sm whitespace-nowrap w-16 text-end"
+        :data-read="isRead(mail)"
+        class="data-[read=false]:font-semibold w-16 text-sm whitespace-nowrap text-end"
       >
         {{ formatDate(mail.date) }}
       </time>
