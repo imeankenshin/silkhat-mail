@@ -19,7 +19,7 @@ const isSelected = computed(() => mailId.value === props.mail.id)
     :aria-selected="isSelected"
     :aria-label="`Email from ${mail.from}: ${mail.subject}`"
     tabindex="-1"
-    class="w-full group flex gap-3 outline-none items-center px-8 h-16 hover:bg-muted/50 focus:bg-muted/50 cursor-pointer"
+    class="w-full group flex gap-3 outline-none items-center px-4 h-16 hover:bg-muted/50 focus:bg-muted/50 cursor-pointer"
     @click="select(mail.id)"
     @keydown.enter.space.prevent="select(mail.id)"
     @keydown.s.prevent="emit('toggle-star')"
@@ -66,7 +66,7 @@ const isSelected = computed(() => mailId.value === props.mail.id)
     >
       <time
         :datetime="mail.date"
-        class="font-semibold text-sm"
+        class="font-semibold text-sm whitespace-nowrap w-16 text-end"
       >
         {{ formatDate(mail.date) }}
       </time>

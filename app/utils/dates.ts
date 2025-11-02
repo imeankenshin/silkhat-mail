@@ -7,7 +7,7 @@ export function formatDate(date: string | number | Date) {
   }
 
   if (isSameYear(date, Date.now())) {
-    return format(date, 'MM/dd')
+    return format(date, 'MMM dd')
   }
 
   return format(date, 'yyyy/MM/dd')
