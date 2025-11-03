@@ -20,7 +20,7 @@ const isSelected = computed(() => mailId.value === props.mail.id)
     :aria-label="`Email from ${mail.from}: ${mail.subject}`"
     :data-read="isRead(mail)"
     tabindex="-1"
-    class="w-full group flex gap-3 outline-none items-center px-4 h-16 hover:bg-muted/50 focus:bg-muted/50 cursor-pointer data-[read=true]:text-muted-foreground"
+    class="w-full group flex gap-3 outline-none items-center px-4 h-16 hover:bg-muted/50 focus:bg-muted/100 cursor-pointer data-[read=true]:text-muted-foreground"
     @click="select(mail.id)"
     @keydown.enter.space.prevent="select(mail.id)"
     @keydown.s.prevent="emit('toggle-star')"
@@ -42,7 +42,7 @@ const isSelected = computed(() => mailId.value === props.mail.id)
     </UiButton>
 
     <!-- メール情報 -->
-    <span class="font-medium text-sm truncate text-unwrap w-44 shrink-0 ml-3">
+    <span class="font-medium truncate text-unwrap w-44 shrink-0 ml-3">
       {{ mail.from }}
     </span>
     <div class="flex w-full gap-2 min-w-0">
