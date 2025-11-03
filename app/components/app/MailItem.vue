@@ -9,12 +9,12 @@ const emit = defineEmits<{
 
 const { mailId, select } = useSelectedMail()
 const isSelected = computed(() => mailId.value === props.mail.id)
-</script>j
+</script>
 
 <template>
   <div
     :key="mail.id"
-    :to="`/mails?id=${mail}`"
+    :to="`/mails?id=${mail.id}`"
     role="listitem"
     :aria-selected="isSelected"
     :aria-label="`Email from ${mail.from}: ${mail.subject}`"
