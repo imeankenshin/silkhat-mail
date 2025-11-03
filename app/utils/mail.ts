@@ -2,6 +2,10 @@ export const isStarred = (mail: Mail) => {
   return mail.labels.includes('STARRED')
 }
 
+export const isRead = (mail: Mail) => {
+  return !mail.labels.includes('UNREAD')
+}
+
 export const toStarred = (mail: Mail): Mail => {
   const cloned = structuredClone(mail)
   if (!cloned.labels.includes('STARRED')) {
