@@ -46,7 +46,7 @@ const isSelected = computed(() => mailId.value === props.mail.id)
       {{ mail.from }}
     </span>
     <div class="flex w-full gap-2 min-w-0">
-      <span class="text-sm truncate w-min">
+      <span class="text-sm truncate">
         {{ mail.subject }}
       </span>
       <span class="text-muted-foreground text-sm truncate flex-1">
