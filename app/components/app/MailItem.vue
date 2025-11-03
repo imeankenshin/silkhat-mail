@@ -9,7 +9,7 @@ const emit = defineEmits<{
 
 const { mailId, select } = useSelectedMail()
 const isSelected = computed(() => mailId.value === props.mail.id)
-</script>
+</script>j
 
 <template>
   <div
@@ -50,7 +50,7 @@ const isSelected = computed(() => mailId.value === props.mail.id)
         {{ mail.subject }}
       </span>
       <span class="text-muted-foreground text-sm truncate flex-1">
-        {{ mail.snippet.replaceAll('\u200d', ' ').trim() }}
+        {{ mail.snippet.replaceAll(/(\u200d|\u200c)/g, ' ').trim() }}
       </span>
     </div>
 
