@@ -43,21 +43,21 @@ const open = defineModel<boolean>('open', {
               <UiButton
                 size="icon"
                 variant="ghost"
-                @click="() => $emit('minimize')"
+                @click.prevent="$emit('minimize')"
               >
                 <Icon name="material-symbols:minimize-rounded" />
               </UiButton>
               <UiButton
                 size="icon"
                 variant="ghost"
-                @click="open = false"
+                @click.prevent="open = false"
               >
                 <Icon name="material-symbols:close-fullscreen-rounded" />
               </UiButton>
               <UiButton
                 size="icon"
                 variant="ghost"
-                @click="() => $emit('close')"
+                @click.prevent="$emit('close')"
               >
                 <Icon name="material-symbols:close-rounded" />
               </UiButton>
