@@ -62,11 +62,10 @@ const { mutate: send, isLoading, status: sendStatus } = useMutation({
   },
   onError(err) {
     console.error(err)
-    toast.error('Failed to send mail')
   }
 })
 
-const { mutate: save, status: saveStatus, asyncStatus: saveAsyncStatus, reset: resetSave } = useMutation({
+const { mutate: save, status: saveStatus, asyncStatus: saveAsyncStatus, reset: resetSave, error: saveError } = useMutation({
   mutation: () =>
     draftId.value
       ? $trpc.drafts.update.mutate({
@@ -86,17 +85,14 @@ const { mutate: save, status: saveStatus, asyncStatus: saveAsyncStatus, reset: r
   },
   onError(err) {
     console.error(err)
-    toast.error('Failed to save mail')
   }
 })
 
 const focusTo = (event: KeyboardEvent, target: 'first' | 'last' = 'first') => {
   if (!(event.currentTarget instanceof HTMLElement)) return
-  const focusableEls = event.currentTarget.querySelectorAll('input, textarea, button')
-  const first = focusableEls?.[0]
-  const last = focusableEls?.[focusableEls.length - 1]
-  const expected = target === 'first' ? last : first
-  const el = target === 'first' ? first : last
+  const focusableEls = Array.from(event.currentTarget.querySelectorAll('input, textarea, button'))
+  const expected = focusableEls.at(target === 'first' ? 0 : -1)
+  const el = focusableEls.at(target === 'first' ? 0 : -1)
   if (document.activeElement !== expected) return
   event.preventDefault()
   if (el instanceof HTMLElement) el.focus()
@@ -147,14 +143,14 @@ watch([to, subject, content], () => {
         <UiButton
           size="icon"
           variant="ghost"
-          @click="minimized = !minimized"
+          @click.prevent="minimized = !minimized"
         >
           <Icon :name="minimized ? 'material-symbols:maximize-rounded' : 'material-symbols:minimize-rounded'" />
         </UiButton>
         <UiButton
           size="icon"
           variant="ghost"
-          @click="openedInFull = !openedInFull"
+          @click.prevent="openedInFull = !openedInFull"
         >
           <Icon
             :name="openedInFull ? 'material-symbols:close-fullscreen-rounded' : 'material-symbols:open-in-full-rounded'"
@@ -163,7 +159,7 @@ watch([to, subject, content], () => {
         <UiButton
           size="icon"
           variant="ghost"
-          @click="emit('close')"
+          @click.prevent="emit('close')"
         >
           <Icon name="material-symbols:close-rounded" />
         </UiButton>
@@ -218,10 +214,11 @@ watch([to, subject, content], () => {
         </div>
         <div
           v-else-if="saveStatus === 'error'"
-          class="flex items-center gap-2"
+          :title="saveError?.message"
+          class="flex items-center gap-2 text-destructive-foreground truncate"
         >
           <Icon name="material-symbols:error-rounded" />
-          <span class="text-xs">Failed to save the progress</span>
+          <span class="text-xs">Failed to save the progress: {{ saveError?.message }}</span>
         </div>
         <div
           v-else-if="saveStatus === 'success'"
@@ -238,7 +235,7 @@ watch([to, subject, content], () => {
   <AppMailComposeWindowFullScreen
     v-model:open="openedInFull"
     :window-name="subject"
-    @close="openedInFull = false"
+    @close="emit('close')"
     @minimize="minimized = true"
   >
     <form
@@ -297,10 +294,11 @@ watch([to, subject, content], () => {
         </div>
         <div
           v-else-if="saveStatus === 'error'"
-          class="flex items-center gap-2"
+          class="flex items-center gap-2 text-destructive-foreground truncate"
+          :title="saveError?.message"
         >
           <Icon name="material-symbols:error-rounded" />
-          <span class="text-xs">Failed to save the progress</span>
+          <span class="text-xs">Failed to save the progress: {{ saveError?.message }}</span>
         </div>
         <div
           v-else-if="saveStatus === 'success'"
